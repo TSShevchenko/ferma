@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4CAF50">
+    <title>AR Ферма 🌱</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        :root {
+            --green:       #4CAF50;
+            --green-light: #81C784;
+            --green-dark:  #2E7D32;
+            --cream:       #FFFBF2;
+            --brown:       #6D4C41;
+            --brown-dark:  #4E342E;
+            --gold:        #FFC107;
+            --gold-dark:   #F57F17;
+            --blue:        #1E88E5;
+            --text:        #3E2723;
+            --text-mid:    #6D4C41;
+            --text-light:  #A1887F;
+            --shadow:      rgba(0,0,0,0.12);
+        }
+
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'Segoe UI', sans-serif;
+            background: #e8ede0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            background: var(--cream);
+            width: 100%;
+            max-width: 390px;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===========================
+           SCREEN SYSTEM
+        =========================== */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        .screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(24px);
+        }
+
+        /* ===========================
+           SPLASH
+        =========================== */
+        #splash {
+            background: linear-gradient(160deg, #c8f5c4 0%, #fdeabf 100%);
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .splash-icon { font-size: 88px; animation: float 2s ease-in-out infinite alternate; }
+
+        @keyframes float {
+            from { transform: translateY(0px); }
+            to   { transform: translateY(-14px); }
+        }
+
+        .splash-title {
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--green-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .splash-tagline {
+            font-size: 15px;
+            color: var(--text-mid);
+        }
+
+        .splash-loader {
+            margin-top: 24px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot-loader {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--green-light);
+            animation: blink 1.2s ease-in-out infinite;
+        }
+        .dot-loader:nth-child(2) { animation-delay: 0.2s; }
+        .dot-loader:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+            40%           { opacity: 1;   transform: scale(1.2); }
+        }
+
+        /* ===========================
+           ONBOARDING
+        =========================== */
+        #onboarding {
+            background: linear-gradient(170deg, #f0fff0 0%, #fffaed 100%);
+            justify-content: flex-end;
+            padding-bottom: 48px;
+        }
+
+        .onb-slides-wrap {
+            position: absolute;
+            inset: 0;
+            bottom: 160px;
+            overflow: hidden;
+        }
+
+        .onb-slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 32px;
+            gap: 20px;
+            transition: opacity 0.4s, transform 0.4s;
+            opacity: 0;
+            transform: translateX(48px);
+        }
+
+        .onb-slide.active { opacity: 1; transform: translateX(0); }
+        .onb-slide.out    { opacity: 0; transform: translateX(-48px); }
+
+        .onb-emoji { font-size: 84px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.12)); }
+
+        .onb-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            text-align: center;
+            line-height: 1.35;
+        }
+
+        .onb-desc {
+            font-size: 15px;
+            color: var(--text-mid);
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        .onb-step-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 32px;
+        }
+
+        .onb-arrow { font-size: 18px; color: var(--green); }
+
+        .onb-badge {
+            background: #FFF3CD;
+            border: 2px solid #FFC107;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #7B5800;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Bottom controls */
+        .onb-controls {
+            width: 100%;
+            padding: 0 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .onb-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .onb-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+            transition: all 0.3s;
+        }
+
+        .onb-dot.active {
+            background: var(--green);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px 24px;
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(76,175,80,0.35);
+            transition: transform 0.12s, box-shadow 0.12s;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+            box-shadow: 0 3px 10px rgba(76,175,80,0.25);
+        }
+
+        .btn-ghost {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 16px;
+        }
+
+        /* ===========================
+           GAME SCREEN
+        =========================== */
+        #game {
+            justify-content: flex-start;
+            background: #e8f0db;
+        }
+
+        /* ── Top bar ── */
+        .top-bar {
+            width: 100%;
+            padding: 50px 18px 14px;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: relative;
+            z-index: 10;
+        }
+
+        .score-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #FFF8E1;
+            border: 2px solid #FFD54F;
+            padding: 6px 14px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .score-val {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--gold-dark);
+            min-width: 28px;
+            text-align: right;
+        }
+
+        .progress-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .progress-label {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .prog-bar-bg {
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .prog-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #66BB6A, #2E7D32);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* ── Sky ── */
+        .sky {
+            width: 100%;
+            height: 72px;
+            background: linear-gradient(180deg, #64B5F6 0%, #B3E5FC 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            font-size: 24px;
+            padding: 0 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sun {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 32px;
+            animation: sun-glow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes sun-glow {
+            from { filter: drop-shadow(0 0 4px rgba(255,200,0,0.4)); }
+            to   { filter: drop-shadow(0 0 16px rgba(255,200,0,0.9)); }
+        }
+
+        .cloud {
+            font-size: 28px;
+            animation: drift 12s linear infinite;
+            position: absolute;
+        }
+
+        .cloud-1 { top: 12px; left: -30px; animation-duration: 14s; }
+        .cloud-2 { top: 26px; left: -60px; animation-duration: 20s; animation-delay: -7s; font-size: 22px; }
+
+        @keyframes drift {
+            from { transform: translateX(0); }
+            to   { transform: translateX(450px); }
+        }
+
+        .grass {
+            width: 100%;
+            height: 22px;
+            background: linear-gradient(180deg, #7CB342, #558B2F);
+            box-shadow: 0 3px 0 #33691E;
+        }
+
+        /* ── Farm area ── */
+        .farm-area {
+            flex: 1;
+            width: 100%;
+            padding: 18px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+        }
+
+        .beds-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        /* ── Bed ── */
+        .bed {
+            aspect-ratio: 1;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.12s, box-shadow 0.2s;
+            background: #8B6654;
+            box-shadow: 0 5px 0 #5D4037, 0 6px 12px rgba(0,0,0,0.18);
+            min-height: 90px;
+        }
+
+        .bed::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .bed:active { transform: scale(0.93) translateY(3px); box-shadow: 0 2px 0 #5D4037, 0 3px 6px rgba(0,0,0,0.15); }
+
+        .bed.state-seed   { background: #795548; }
+        .bed.state-sprout { background: #6D8B3A; }
+        .bed.state-flower { background: #7B6FA0; }
+        .bed.state-ready  {
+            background: #4CAF50;
+            animation: pulse-ready 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-ready {
+            0%, 100% { box-shadow: 0 5px 0 #388E3C, 0 6px 12px rgba(76,175,80,0.3); }
+            50%       { box-shadow: 0 5px 0 #388E3C, 0 6px 28px rgba(76,175,80,0.6); }
+        }
+
+        .bed-plant { font-size: 34px; z-index: 1; transition: transform 0.25s; }
+        .bed.state-ready .bed-plant { animation: bob 0.9s ease-in-out infinite alternate; }
+
+        @keyframes bob {
+            from { transform: scale(1); }
+            to   { transform: scale(1.12) translateY(-2px); }
+        }
+
+        .bed-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.75);
+            z-index: 1;
+        }
+
+        .bed-timer {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.95);
+            background: rgba(0,0,0,0.22);
+            padding: 2px 7px;
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .bed-water-badge {
+            position: absolute;
+            top: 6px; right: 8px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .bed.watered .bed-water-badge { opacity: 1; }
+
+        /* Placeholder bed (invisible) */
+        .bed-placeholder {
+            aspect-ratio: 1;
+            min-height: 90px;
+            visibility: hidden;
+        }
+
+        /* ── Bottom bar ── */
+        .bottom-bar {
+            width: 100%;
+            padding: 12px 16px 36px;
+            background: white;
+            box-shadow: 0 -3px 12px var(--shadow);
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 11px 8px;
+            border: none;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.12s;
+            letter-spacing: 0.2px;
+        }
+
+        .action-btn:active { transform: scale(0.93); }
+
+        .action-btn .ab-icon { font-size: 26px; }
+
+        .btn-water  { background: #E3F2FD; color: #1565C0; }
+        .btn-water.on { background: #1E88E5; color: white; box-shadow: 0 3px 12px rgba(30,136,229,0.35); }
+
+        .btn-store  { background: #F3E5F5; color: #6A1B9A; opacity: 0.45; cursor: default; }
+        .btn-stats  { background: #E8F5E9; color: #1B5E20; }
+
+        /* ===========================
+           TUTORIAL OVERLAY
+        =========================== */
+        #tutorial {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        .tut-spotlight {
+            position: absolute;
+            border-radius: 20px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
+            pointer-events: auto;
+            transition: all 0.35s ease;
+        }
+
+        .tut-bubble {
+            position: absolute;
+            background: #1A1A2E;
+            color: white;
+            padding: 13px 17px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 230px;
+            pointer-events: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            transition: all 0.35s ease;
+        }
+
+        .tut-bubble::before {
+            content: '';
+            position: absolute;
+            border: 9px solid transparent;
+        }
+
+        .tut-bubble.tip-down::before {
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-top-color: #1A1A2E;
+        }
+
+        .tut-bubble.tip-up::before {
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-color: #1A1A2E;
+        }
+
+        .tut-finger {
+            position: absolute;
+            font-size: 30px;
+            pointer-events: none;
+            animation: tap-hint 1.3s ease-in-out infinite;
+            z-index: 501;
+        }
+
+        @keyframes tap-hint {
+            0%,100% { transform: scale(1) translateY(0); }
+            50%      { transform: scale(1.18) translateY(-4px); }
+        }
+
+        /* ===========================
+           HARVEST MODAL
+        =========================== */
+        #harvest-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 600;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 30px;
+            padding: 36px 32px 28px;
+            text-align: center;
+            width: min(320px, 88vw);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+            animation: pop-in 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+
+        @keyframes pop-in {
+            from { transform: scale(0.5) translateY(20px); opacity: 0; }
+            to   { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-harvest-icon { font-size: 72px; display: block; }
+        .modal-title { font-size: 22px; font-weight: 700; color: var(--text); margin: 12px 0 4px; }
+        .modal-pts   { font-size: 38px; font-weight: 900; color: var(--green-dark); }
+        .modal-sub   { font-size: 14px; color: var(--text-light); margin: 4px 0 22px; }
+
+        /* ===========================
+           STATS MODAL
+        =========================== */
+        #stats-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 600;
+            backdrop-filter: blur(3px);
+        }
+
+        .stats-sheet {
+            background: white;
+            border-radius: 28px 28px 0 0;
+            padding: 8px 28px 48px;
+            width: min(390px, 100vw);
+            animation: slide-up 0.3s ease;
+        }
+
+        @keyframes slide-up {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+
+        .sheet-handle {
+            width: 40px; height: 4px;
+            background: #E0E0E0;
+            border-radius: 2px;
+            margin: 12px auto 20px;
+        }
+
+        .stats-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #F5F5F5;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-val { font-size: 28px; font-weight: 800; color: var(--green-dark); }
+        .stat-label { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+        /* ===========================
+           FLOATING POINTS
+        =========================== */
+        .float-pts {
+            position: fixed;
+            font-size: 20px;
+            font-weight: 800;
+            color: #43A047;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+            pointer-events: none;
+            z-index: 700;
+            animation: pts-fly 1s ease-out forwards;
+        }
+
+        @keyframes pts-fly {
+            from { opacity: 1;   transform: translateY(0)    scale(1); }
+            50%  { opacity: 1;   transform: translateY(-30px) scale(1.2); }
+            to   { opacity: 0;   transform: translateY(-70px) scale(0.8); }
+        }
+
+        /* ===========================
+           WATER SPLASH
+        =========================== */
+        .w-splash {
+            position: fixed;
+            font-size: 22px;
+            pointer-events: none;
+            z-index: 700;
+            animation: w-anim 0.7s ease-out forwards;
+        }
+
+        @keyframes w-anim {
+            from { opacity: 1; transform: scale(0.6); }
+            to   { opacity: 0; transform: scale(1.6) translateY(-16px); }
+        }
+
+        /* ===========================
+           UTILITY
+        =========================== */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <!-- ====== SPLASH ====== -->
+    <div class="screen" id="splash">
+        <div class="splash-icon">🌱</div>
+        <div class="splash-title">AR Ферма</div>
+        <div class="splash-tagline">Расти — собирай — получай</div>
+        <div class="splash-loader">
+            <div class="dot-loader"></div>
+            <div class="dot-loader"></div>
+            <div class="dot-loader"></div>
+        </div>
+    </div>
+
+    <!-- ====== ONBOARDING ====== -->
+    <div class="screen hidden" id="onboarding">
+        <div class="onb-slides-wrap">
+            <div class="onb-slide active" id="onb-0">
+                <div class="onb-emoji">🌱</div>
+                <div class="onb-title">Привет!<br>Это твоя ферма</div>
+                <div class="onb-desc">Выращивай клубнику,<br>ухаживай за растениями<br>и собирай урожай каждый день</div>
+            </div>
+            <div class="onb-slide" id="onb-1">
+                <div class="onb-step-icons">
+                    <span>🌱</span>
+                    <span class="onb-arrow">→</span>
+                    <span>🍓</span>
+                    <span class="onb-arrow">→</span>
+                    <span>🎁</span>
+                </div>
+                <div class="onb-title">Сажай, поливай,<br>собирай урожай</div>
+                <div class="onb-desc">Возвращайся каждый день.<br>Клубника растёт, пока тебя нет —<br>ты только поливай вовремя 💧</div>
+            </div>
+            <div class="onb-slide" id="onb-2">
+                <div class="onb-emoji">🚚</div>
+                <div class="onb-title">Скоро:<br>настоящие продукты!</div>
+                <div class="onb-desc">Игра в раннем доступе.</div>
+                <div class="onb-badge">
+                    В следующих версиях ты сможешь<br>
+                    обменять урожай на настоящую<br>
+                    клубнику с доставкой домой 🍓
+                </div>
+            </div>
+        </div>
+
+        <div class="onb-controls">
+            <div class="onb-dots">
+                <div class="onb-dot active" id="odot-0"></div>
+                <div class="onb-dot" id="odot-1"></div>
+                <div class="onb-dot" id="odot-2"></div>
+            </div>
+            <button class="btn-primary" id="onb-next-btn">Далее →</button>
+            <button class="btn-ghost" id="onb-skip-btn">Пропустить</button>
+        </div>
+    </div>
+
+    <!-- ====== GAME ====== -->
+    <div class="screen hidden" id="game">
+        <!-- Top bar -->
+        <div class="top-bar">
+            <div class="score-pill">
+                <span>🌾</span>
+                <span class="score-val" id="score-val">0</span>
+            </div>
+            <div class="progress-col">
+                <div class="progress-label">До разблокировки: <span id="prog-remaining">500</span> ✦</div>
+                <div class="prog-bar-bg">
+                    <div class="prog-bar-fill" id="prog-fill"></div>
+                </div>
+            </div>
+            <button class="settings-btn" onclick="openStats()">📊</button>
+        </div>
+
+        <!-- Sky -->
+        <div class="sky">
+            <span class="cloud cloud-1">☁️</span>
+            <span class="cloud cloud-2">☁️</span>
+            <span class="sun">☀️</span>
+        </div>
+        <div class="grass"></div>
+
+        <!-- Farm beds -->
+        <div class="farm-area" id="farm-area">
+            <div class="beds-row">
+                <div class="bed" id="bed-0" onclick="tapBed(0)">
+                    <span class="bed-water-badge">💧</span>
+                    <span class="bed-plant">🪹</span>
+                    <span class="bed-label">Грядка 1</span>
+                </div>
+                <div class="bed" id="bed-1" onclick="tapBed(1)">
+                    <span class="bed-water-badge">💧</span>
+                    <span class="bed-plant">🪹</span>
+                    <span class="bed-label">Грядка 2</span>
+                </div>
+                <div class="bed" id="bed-2" onclick="tapBed(2)">
+                    <span class="bed-water-badge">💧</span>
+                    <span class="bed-plant">🪹</span>
+                    <span class="bed-label">Грядка 3</span>
+                </div>
+            </div>
+            <div class="beds-row">
+                <div class="bed" id="bed-3" onclick="tapBed(3)">
+                    <span class="bed-water-badge">💧</span>
+                    <span class="bed-plant">🪹</span>
+                    <span class="bed-label">Грядка 4</span>
+                </div>
+                <div class="bed" id="bed-4" onclick="tapBed(4)">
+                    <span class="bed-water-badge">💧</span>
+                    <span class="bed-plant">🪹</span>
+                    <span class="bed-label">Грядка 5</span>
+                </div>
+                <div class="bed-placeholder"></div>
+            </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="bottom-bar">
+            <button class="action-btn btn-water" id="water-btn" onclick="toggleWater()">
+                <span class="ab-icon">🚿</span>
+                <span>Полив</span>
+            </button>
+            <button class="action-btn btn-store" disabled>
+                <span class="ab-icon">🏪</span>
+                <span>Магазин</span>
+            </button>
+            <button class="action-btn btn-stats" onclick="openStats()">
+                <span class="ab-icon">📈</span>
+                <span>Статус</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ====== TUTORIAL ====== -->
+    <div id="tutorial" class="hidden"></div>
+
+    <!-- ====== HARVEST MODAL ====== -->
+    <div id="harvest-modal" class="hidden">
+        <div class="modal-card">
+            <span class="modal-harvest-icon">🍓</span>
+            <div class="modal-title">Урожай собран!</div>
+            <div class="modal-pts" id="modal-pts">+50</div>
+            <div class="modal-sub" id="modal-sub">Свежая клубника в корзине 🧺</div>
+            <button class="btn-primary" onclick="closeHarvest()">Посадить ещё 🌱</button>
+        </div>
+    </div>
+
+    <!-- ====== STATS MODAL ====== -->
+    <div id="stats-modal" class="hidden" onclick="closeStats(event)">
+        <div class="stats-sheet" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="stats-title">Моя ферма 🌿</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="st-score">0</div>
+                    <div class="stat-label">Очков всего</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="st-harvests">0</div>
+                    <div class="stat-label">Урожаев собрано</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="st-growing">0</div>
+                    <div class="stat-label">Растут сейчас</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="st-ready">0</div>
+                    <div class="stat-label">Готово к сбору</div>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="closeStats()">Закрыть</button>
+        </div>
+    </div>
+
+</div><!-- #app -->
+
+<script>
+// ==========================================
+//  CONSTANTS
+// ==========================================
+const PHASES      = ['empty','seed','sprout','flower','ready'];
+const PHASE_EMOJI = { empty:'🪹', seed:'🌱', sprout:'🌿', flower:'🌸', ready:'🍓' };
+const PHASE_LABEL = { empty:'Нажми — посади', seed:'Прорастает...', sprout:'Развивается...', flower:'Почти готово!', ready:'Нажми — собери!' };
+const PHASE_BG    = { empty:'#8B6654', seed:'#795548', sprout:'#6D8B3A', flower:'#7B6FA0', ready:'#4CAF50' };
+
+// Prototype: 40 sec/phase → 2 min total. Change to 14400 (4h) for real.
+const PHASE_MS    = 40 * 1000;
+const UNLOCK_TARGET = 500;
+
+// ==========================================
+//  STATE
+// ==========================================
+let beds = Array.from({length: 5}, () => ({
+    state:       'empty',
+    startedAt:   null,
+    phaseMs:     PHASE_MS,
+    watered:     false,
+    timerId:     null
+}));
+
+let score     = 0;
+let harvests  = 0;
+let waterMode = false;
+let tutStep   = 0;
+
+// ==========================================
+//  SPLASH → ONBOARDING
+// ==========================================
+setTimeout(() => {
+    showScreen('onboarding');
+}, 2400);
+
+// ==========================================
+//  ONBOARDING
+// ==========================================
+let onbIdx = 0;
+const ONB_COUNT = 3;
+
+function refreshOnb() {
+    for (let i = 0; i < ONB_COUNT; i++) {
+        const s = document.getElementById('onb-' + i);
+        const d = document.getElementById('odot-' + i);
+        s.className = 'onb-slide' + (i === onbIdx ? ' active' : (i < onbIdx ? ' out' : ''));
+        d.className = 'onb-dot'   + (i === onbIdx ? ' active' : '');
+    }
+    const btn = document.getElementById('onb-next-btn');
+    const skip = document.getElementById('onb-skip-btn');
+    btn.textContent = onbIdx === ONB_COUNT - 1 ? '🌱 Начать игру' : 'Далее →';
+    skip.style.visibility = onbIdx === ONB_COUNT - 1 ? 'hidden' : 'visible';
+}
+
+document.getElementById('onb-next-btn').onclick = () => {
+    if (onbIdx < ONB_COUNT - 1) { onbIdx++; refreshOnb(); }
+    else startGame();
+};
+
+document.getElementById('onb-skip-btn').onclick = () => {
+    onbIdx = ONB_COUNT - 1;
+    refreshOnb();
+};
+
+// ==========================================
+//  GAME START
+// ==========================================
+function startGame() {
+    showScreen('game');
+    setInterval(tickBeds, 500);
+    setTimeout(tutorialStart, 600);
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+}
+
+// ==========================================
+//  TUTORIAL
+// ==========================================
+const TUT_STEPS = [
+    { bedIdx: 0, text: '👆 Нажми на грядку, чтобы посадить клубнику',    waitFor: 'seed'  },
+    { bedIdx: 0, text: '🚿 Включи полив и нажми на грядку, чтобы ускорить рост', waitFor: 'watered' },
+    { bedIdx: 0, text: '🍓 Урожай созрел! Нажми на грядку, чтобы собрать', waitFor: 'harvested' }
+];
+
+function tutorialStart() {
+    tutStep = 0;
+    renderTutStep();
+}
+
+function renderTutStep() {
+    const tut = document.getElementById('tutorial');
+    if (tutStep >= TUT_STEPS.length) { tut.classList.add('hidden'); return; }
+
+    const step = TUT_STEPS[tutStep];
+    const bedEl = document.getElementById('bed-' + step.bedIdx);
+    if (!bedEl) { tut.classList.add('hidden'); return; }
+
+    const r = bedEl.getBoundingClientRect();
+    const cx = r.left + r.width  / 2;
+    const cy = r.top  + r.height / 2;
+    const pad = 8;
+
+    // Bubble position: above or below
+    const spaceAbove = r.top - pad - 90;
+    const bubbleTop  = spaceAbove > 60
+        ? (r.top - pad - 82)
+        : (r.bottom + pad + 12);
+    const tipClass   = spaceAbove > 60 ? 'tip-down' : 'tip-up';
+
+    const bubbleLeft = Math.max(8, Math.min(cx - 115, window.innerWidth - 246));
+
+    tut.innerHTML = `
+        <div class="tut-spotlight" style="
+            left:${r.left - pad}px; top:${r.top - pad}px;
+            width:${r.width + pad*2}px; height:${r.height + pad*2}px;
+        " onclick="tutSpotlightTap(${step.bedIdx})"></div>
+        <div class="tut-finger" style="left:${cx - 16}px; top:${r.bottom + 4}px">👆</div>
+        <div class="tut-bubble ${tipClass}" style="left:${bubbleLeft}px; top:${bubbleTop}px; width:230px">
+            ${step.text}
+        </div>
+    `;
+    tut.classList.remove('hidden');
+}
+
+function tutSpotlightTap(bedIdx) {
+    tapBed(bedIdx, true);
+}
+
+function tutAdvance(event) {
+    if (tutStep >= TUT_STEPS.length) return;
+    const step = TUT_STEPS[tutStep];
+    const needed = step.waitFor;
+    if (needed === event) {
+        tutStep++;
+        setTimeout(renderTutStep, 350);
+    }
+}
+
+// ==========================================
+//  BED INTERACTION
+// ==========================================
+function tapBed(idx, fromTut = false) {
+    const bed = beds[idx];
+
+    if (bed.state === 'empty') {
+        plant(idx);
+    } else if (bed.state === 'ready') {
+        harvest(idx);
+    } else if (waterMode) {
+        waterBed(idx);
+    } else {
+        // wobble
+        const el = document.getElementById('bed-' + idx);
+        el.style.transform = 'scale(0.93)';
+        setTimeout(() => el.style.transform = '', 120);
+    }
+}
+
+function plant(idx) {
+    const bed = beds[idx];
+    bed.state     = 'seed';
+    bed.startedAt = Date.now();
+    bed.phaseMs   = PHASE_MS;
+    bed.watered   = false;
+    updateBedEl(idx);
+    tutAdvance('seed');
+}
+
+function waterBed(idx) {
+    const bed = beds[idx];
+    if (bed.state === 'empty' || bed.state === 'ready' || bed.watered) return;
+
+    bed.watered = true;
+    // Reduce remaining time in phase by 45%
+    const elapsed = Date.now() - bed.startedAt;
+    const rem = Math.max(0, bed.phaseMs - elapsed);
+    bed.startedAt = Date.now() - elapsed - rem * 0.45;
+
+    updateBedEl(idx);
+    spawnSplash(idx);
+    tutAdvance('watered');
+}
+
+function harvest(idx) {
+    const pts = 45 + Math.floor(Math.random() * 30);
+    score    += pts;
+    harvests += 1;
+    updateScore();
+    spawnFloatPts(idx, pts);
+
+    document.getElementById('modal-pts').textContent = '+' + pts + ' очков';
+    document.getElementById('modal-sub').textContent = pts >= 65 ? '🌟 Отличный урожай!' : '🧺 Клубника в корзине!';
+    document.getElementById('harvest-modal').classList.remove('hidden');
+
+    // Reset bed
+    const bed = beds[idx];
+    bed.state = 'empty'; bed.startedAt = null; bed.watered = false;
+    updateBedEl(idx);
+    tutAdvance('harvested');
+}
+
+function closeHarvest() {
+    document.getElementById('harvest-modal').classList.add('hidden');
+}
+
+// ==========================================
+//  GROWTH TICK
+// ==========================================
+function tickBeds() {
+    beds.forEach((bed, idx) => {
+        if (bed.state === 'empty' || bed.state === 'ready') return;
+        const phaseIdx = PHASES.indexOf(bed.state);
+        if (phaseIdx < 1) return;
+        const elapsed = Date.now() - bed.startedAt;
+        if (elapsed >= bed.phaseMs) {
+            const next = PHASES[phaseIdx + 1];
+            if (next) {
+                bed.state = next;
+                bed.startedAt = Date.now();
+                bed.watered   = false;
+                updateBedEl(idx);
+                if (idx === 0 && next === 'ready') tutAdvance('ready_check');
+            }
+        } else {
+            const rem = Math.ceil((bed.phaseMs - elapsed) / 1000);
+            const t = document.getElementById('btimer-' + idx);
+            if (t) t.textContent = rem + 'с';
+        }
+    });
+    // Tutorial: check if bed-0 ready
+    if (beds[0].state === 'ready' && tutStep === 2) renderTutStep();
+}
+
+// ==========================================
+//  BED DOM UPDATE
+// ==========================================
+function updateBedEl(idx) {
+    const bed = beds[idx];
+    const el  = document.getElementById('bed-' + idx);
+    if (!el) return;
+
+    // Emoji
+    el.querySelector('.bed-plant').textContent = PHASE_EMOJI[bed.state];
+
+    // Label
+    el.querySelector('.bed-label').textContent = PHASE_LABEL[bed.state];
+
+    // State class
+    el.className = 'bed state-' + bed.state + (bed.watered ? ' watered' : '');
+    el.className += ' state-' + bed.state;
+    if (bed.watered) el.classList.add('watered');
+
+    // Background color
+    el.style.background = PHASE_BG[bed.state];
+
+    // Timer element
+    let t = document.getElementById('btimer-' + idx);
+    if (!t) {
+        t = document.createElement('span');
+        t.id = 'btimer-' + idx;
+        t.className = 'bed-timer';
+        el.appendChild(t);
+    }
+    const showTimer = bed.state !== 'empty' && bed.state !== 'ready';
+    t.style.display = showTimer ? '' : 'none';
+    if (showTimer) {
+        const rem = Math.ceil(Math.max(0, bed.phaseMs - (Date.now() - (bed.startedAt || Date.now()))) / 1000);
+        t.textContent = rem + 'с';
+    }
+
+    // Ready state pulse
+    if (bed.state === 'ready') el.classList.add('state-ready');
+}
+
+// ==========================================
+//  WATER MODE
+// ==========================================
+function toggleWater() {
+    waterMode = !waterMode;
+    const btn = document.getElementById('water-btn');
+    btn.classList.toggle('on', waterMode);
+    btn.querySelector('.ab-icon').textContent = waterMode ? '💧' : '🚿';
+}
+
+// ==========================================
+//  SCORE & PROGRESS
+// ==========================================
+function updateScore() {
+    document.getElementById('score-val').textContent = score;
+    const pct = Math.min(score / UNLOCK_TARGET * 100, 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    const rem = Math.max(0, UNLOCK_TARGET - score);
+    document.getElementById('prog-remaining').textContent = rem > 0 ? rem : '✓ Открыто!';
+}
+
+// ==========================================
+//  STATS
+// ==========================================
+function openStats() {
+    document.getElementById('st-score').textContent    = score;
+    document.getElementById('st-harvests').textContent = harvests;
+    document.getElementById('st-growing').textContent  = beds.filter(b => b.state !== 'empty' && b.state !== 'ready').length;
+    document.getElementById('st-ready').textContent    = beds.filter(b => b.state === 'ready').length;
+    document.getElementById('stats-modal').classList.remove('hidden');
+}
+
+function closeStats(e) {
+    if (!e || e.target === document.getElementById('stats-modal')) {
+        document.getElementById('stats-modal').classList.add('hidden');
+    }
+}
+
+// ==========================================
+//  VFX
+// ==========================================
+function spawnFloatPts(idx, pts) {
+    const el = document.getElementById('bed-' + idx);
+    const r  = el.getBoundingClientRect();
+    const f  = document.createElement('div');
+    f.className   = 'float-pts';
+    f.textContent = '+' + pts + ' 🌾';
+    f.style.left  = (r.left + r.width / 2 - 30) + 'px';
+    f.style.top   = r.top + 'px';
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 1100);
+}
+
+function spawnSplash(idx) {
+    const el = document.getElementById('bed-' + idx);
+    const r  = el.getBoundingClientRect();
+    const s  = document.createElement('div');
+    s.className   = 'w-splash';
+    s.textContent = '💧';
+    s.style.left  = (r.left + r.width / 2 - 11) + 'px';
+    s.style.top   = (r.top  + r.height / 2 - 11) + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 750);
+}
+</script>
+</body>
+</html>
