@@ -24,19 +24,24 @@
             --shadow:      rgba(0,0,0,0.12);
         }
 
-        html, body {
+        html {
+            height: 100%;
+        }
+
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'Segoe UI', sans-serif;
             background: #e8ede0;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
+            min-height: 100%;
+            margin: 0;
         }
 
         #app {
             background: var(--cream);
             width: 100%;
             max-width: 390px;
-            min-height: 100vh;
+            height: 100vh;
             position: relative;
             overflow: hidden;
         }
@@ -46,7 +51,7 @@
         =========================== */
         .screen {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             display: flex;
             flex-direction: column;
             align-items: center;

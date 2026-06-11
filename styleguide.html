@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Ферма — Style Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #F5F0E8;
+            color: #3D2B1F;
+            padding: 32px 20px 80px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #3D2B1F;
+            margin-bottom: 4px;
+        }
+
+        .page-sub {
+            font-size: 14px;
+            color: #7A5C44;
+            margin-bottom: 40px;
+        }
+
+        /* ── Section ── */
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #A08070;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #E8DDD0;
+        }
+
+        /* ── Colors ── */
+        .colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .color-chip {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .color-swatch {
+            height: 72px;
+        }
+
+        .color-info {
+            background: white;
+            padding: 10px 12px;
+        }
+
+        .color-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #3D2B1F;
+        }
+
+        .color-hex {
+            font-size: 11px;
+            color: #A08070;
+            font-family: monospace;
+        }
+
+        /* ── Typography ── */
+        .type-samples {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+
+        .type-row {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #F0E8E0;
+        }
+        .type-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .type-label {
+            font-size: 10px;
+            color: #A08070;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            min-width: 80px;
+        }
+
+        .t-h1   { font-size: 32px; font-weight: 900; color: #3D2B1F; }
+        .t-h2   { font-size: 22px; font-weight: 800; color: #3D2B1F; }
+        .t-h3   { font-size: 17px; font-weight: 700; color: #3D2B1F; }
+        .t-body { font-size: 15px; font-weight: 600; color: #3D2B1F; }
+        .t-caption { font-size: 12px; font-weight: 600; color: #7A5C44; }
+        .t-score { font-size: 28px; font-weight: 900; color: #F5C542; }
+        .t-warm  { font-size: 14px; font-weight: 600; color: #7A5C44; line-height: 1.6; }
+
+        /* ── Buttons ── */
+        .buttons { display: flex; flex-direction: column; gap: 12px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 28px;
+            border-radius: 18px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.12s, box-shadow 0.12s;
+            letter-spacing: 0.2px;
+        }
+        .btn:active { transform: scale(0.96); }
+
+        .btn-primary {
+            background: #E8453C;
+            color: white;
+            box-shadow: 0 6px 0 #B53028, 0 8px 20px rgba(232,69,60,0.35);
+        }
+        .btn-primary:active { box-shadow: 0 2px 0 #B53028, 0 3px 10px rgba(232,69,60,0.25); }
+
+        .btn-water {
+            background: #4AADE8;
+            color: white;
+            box-shadow: 0 6px 0 #2A7DB8, 0 8px 20px rgba(74,173,232,0.35);
+        }
+
+        .btn-secondary {
+            background: #FFF8EE;
+            color: #3D2B1F;
+            box-shadow: 0 4px 0 #DDD0C0, 0 6px 16px rgba(0,0,0,0.1);
+            border: 2px solid #E8DDD0;
+        }
+
+        .btn-ghost {
+            background: none;
+            color: #7A5C44;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* ── Beds ── */
+        .beds-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .bed {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bed::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            background: linear-gradient(160deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .bed-empty   { background: #8B5E3C; box-shadow: 0 6px 0 #5C3A20, 0 8px 16px rgba(0,0,0,0.2); }
+        .bed-seed    { background: #7A5030; box-shadow: 0 6px 0 #5C3A20, 0 8px 16px rgba(0,0,0,0.2); }
+        .bed-sprout  { background: #5A9E3A; box-shadow: 0 6px 0 #3A7020, 0 8px 16px rgba(90,158,58,0.3); }
+        .bed-flower  { background: #9B7EC8; box-shadow: 0 6px 0 #7058A0, 0 8px 16px rgba(155,126,200,0.3); }
+        .bed-ready   {
+            background: #E8453C;
+            box-shadow: 0 6px 0 #B53028, 0 8px 24px rgba(232,69,60,0.45);
+            animation: pulse-red 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-red {
+            0%,100% { box-shadow: 0 6px 0 #B53028, 0 8px 24px rgba(232,69,60,0.3); }
+            50%      { box-shadow: 0 6px 0 #B53028, 0 8px 36px rgba(232,69,60,0.7); }
+        }
+
+        .bed-icon  { font-size: 38px; z-index: 1; }
+        .bed-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.85); z-index: 1; }
+        .bed-timer { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.95); background: rgba(0,0,0,0.22); padding: 2px 8px; border-radius: 8px; z-index: 1; }
+
+        /* Plus icon on empty bed */
+        .bed-plus {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 3px dashed rgba(255,255,255,0.5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            color: rgba(255,255,255,0.6);
+            z-index: 1;
+        }
+
+        /* ── Progress bar ── */
+        .progress-demo {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .prog-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prog-label-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #3D2B1F;
+        }
+
+        .prog-label-count {
+            font-size: 13px;
+            font-weight: 800;
+            color: #F5C542;
+        }
+
+        .prog-track {
+            height: 14px;
+            background: #F0E8E0;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 7px;
+            background: linear-gradient(90deg, #E8453C, #F5A623);
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .prog-hint {
+            font-size: 13px;
+            font-weight: 600;
+            color: #5A9E3A;
+            text-align: center;
+        }
+
+        /* ── Score pill ── */
+        .pills { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+        .score-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #FFF8EE;
+            border: 2.5px solid #F5C542;
+            padding: 8px 16px;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(245,197,66,0.25);
+        }
+
+        .score-val {
+            font-size: 20px;
+            font-weight: 900;
+            color: #D4820A;
+        }
+
+        /* ── Toast / Modal preview ── */
+        .modal-preview {
+            background: white;
+            border-radius: 28px;
+            padding: 32px 28px;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            max-width: 300px;
+        }
+
+        .modal-icon { font-size: 72px; display: block; }
+        .modal-title { font-size: 22px; font-weight: 900; color: #3D2B1F; margin: 12px 0 4px; }
+        .modal-pts { font-size: 38px; font-weight: 900; color: #E8453C; }
+        .modal-sub { font-size: 13px; font-weight: 600; color: #7A5C44; margin: 4px 0 20px; }
+
+        /* ── Top bar preview ── */
+        .topbar-preview {
+            background: white;
+            border-radius: 20px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+
+        /* ── Action buttons row ── */
+        .action-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border-radius: 18px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.12s;
+        }
+        .action-btn:active { transform: scale(0.93); }
+        .action-btn span { font-size: 26px; }
+
+        .ab-plant  { background: #EDF7E5; color: #3A7020; box-shadow: 0 3px 0 #C8E0B8; }
+        .ab-water  { background: #E3F4FF; color: #1A6EA8; box-shadow: 0 3px 0 #B0D8F0; }
+        .ab-stats  { background: #FFF3E0; color: #A05010; box-shadow: 0 3px 0 #F0D8B0; }
+
+        /* ── Sky/bg preview ── */
+        .sky-preview {
+            background: linear-gradient(180deg, #B8E4F8 0%, #E8F4C8 100%);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sky-grass {
+            height: 20px;
+            background: linear-gradient(180deg, #5A9E3A, #3A7020);
+            border-radius: 0 0 12px 12px;
+            margin: 0 -20px -20px;
+        }
+
+        /* ── Onboarding dot ── */
+        .onb-dots { display: flex; gap: 8px; justify-content: center; }
+        .onb-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #D0C0B0;
+        }
+        .onb-dot.active {
+            background: #E8453C;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* ── Badge ── */
+        .early-badge {
+            background: #FFF3CD;
+            border: 2px solid #F5C542;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #7B5800;
+            text-align: center;
+            line-height: 1.5;
+            display: inline-block;
+        }
+
+        /* Grid layout for some sections */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+
+        .card-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #A08070;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AR Ферма 🌱</h1>
+    <div class="page-sub">Style Guide — визуальный язык прототипа</div>
+
+    <!-- COLORS -->
+    <div class="section">
+        <div class="section-title">Цветовая палитра</div>
+        <div class="colors">
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#8B5E3C"></div>
+                <div class="color-info"><div class="color-name">Земля / грядки</div><div class="color-hex">#8B5E3C</div></div>
+            </div>
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#5A9E3A"></div>
+                <div class="color-info"><div class="color-name">Трава / акцент</div><div class="color-hex">#5A9E3A</div></div>
+            </div>
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#E8F4C8"></div>
+                <div class="color-info"><div class="color-name">Небо / фон</div><div class="color-hex">#E8F4C8</div></div>
+            </div>
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#E8453C"></div>
+                <div class="color-info"><div class="color-name">Акцент (кнопки)</div><div class="color-hex">#E8453C</div></div>
+            </div>
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#4AADE8"></div>
+                <div class="color-info"><div class="color-name">Вода / полив</div><div class="color-hex">#4AADE8</div></div>
+            </div>
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#F5C542"></div>
+                <div class="color-info"><div class="color-name">Золото / очки</div><div class="color-hex">#F5C542</div></div>
+            </div>
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#FFF8EE"></div>
+                <div class="color-info"><div class="color-name">Карточки</div><div class="color-hex">#FFF8EE</div></div>
+            </div>
+            <div class="color-chip">
+                <div class="color-swatch" style="background:#3D2B1F"></div>
+                <div class="color-info"><div class="color-name">Текст</div><div class="color-hex">#3D2B1F</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TYPOGRAPHY -->
+    <div class="section">
+        <div class="section-title">Типографика — Nunito</div>
+        <div class="type-samples">
+            <div class="type-row">
+                <div class="type-label">H1 / 32px</div>
+                <div class="t-h1">AR Ферма</div>
+            </div>
+            <div class="type-row">
+                <div class="type-label">H2 / 22px</div>
+                <div class="t-h2">Урожай собран!</div>
+            </div>
+            <div class="type-row">
+                <div class="type-label">H3 / 17px</div>
+                <div class="t-h3">Нажми, чтобы посадить</div>
+            </div>
+            <div class="type-row">
+                <div class="type-label">Body / 15px</div>
+                <div class="t-body">Полей растение, чтобы оно росло быстрее 💧</div>
+            </div>
+            <div class="type-row">
+                <div class="type-label">Caption</div>
+                <div class="t-caption">Игра в раннем доступе — доставка скоро</div>
+            </div>
+            <div class="type-row">
+                <div class="type-label">Score</div>
+                <div class="t-score">+62 🌾</div>
+            </div>
+            <div class="type-row">
+                <div class="type-label">Warm copy</div>
+                <div class="t-warm">Твоя клубника скоро созреет 🍓<br>Загляни через пару часов!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEDS -->
+    <div class="section">
+        <div class="section-title">Грядки — 5 состояний</div>
+        <div class="beds-row">
+            <div class="bed bed-empty">
+                <div class="bed-plus">+</div>
+                <div class="bed-label">Пустая</div>
+            </div>
+            <div class="bed bed-seed">
+                <div class="bed-icon">🌱</div>
+                <div class="bed-label">Посеяна</div>
+                <div class="bed-timer">0:38</div>
+            </div>
+            <div class="bed bed-sprout">
+                <div class="bed-icon">🌿</div>
+                <div class="bed-label">Росток</div>
+                <div class="bed-timer">0:22</div>
+            </div>
+            <div class="bed bed-flower">
+                <div class="bed-icon">🌸</div>
+                <div class="bed-label">Цветёт</div>
+                <div class="bed-timer">0:11</div>
+            </div>
+            <div class="bed bed-ready">
+                <div class="bed-icon">🍓</div>
+                <div class="bed-label">Собирай!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="section">
+        <div class="section-title">Кнопки</div>
+        <div class="buttons">
+            <button class="btn btn-primary">🌱 Начать игру</button>
+            <button class="btn btn-water">💧 Полить грядки</button>
+            <button class="btn btn-secondary">Далее →</button>
+            <button class="btn btn-ghost">Пропустить</button>
+        </div>
+    </div>
+
+    <!-- ACTION BAR -->
+    <div class="section">
+        <div class="section-title">Панель действий</div>
+        <div class="action-row">
+            <button class="action-btn ab-plant">
+                <span>🌱</span>
+                Посадить
+            </button>
+            <button class="action-btn ab-water">
+                <span>💧</span>
+                Полив
+            </button>
+            <button class="action-btn ab-stats">
+                <span>📊</span>
+                Статус
+            </button>
+        </div>
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="section">
+        <div class="section-title">Хэдер</div>
+        <div class="topbar-preview">
+            <div class="score-pill">
+                <span>🪙</span>
+                <span class="score-val">247</span>
+            </div>
+            <div style="flex:1; margin: 0 4px;">
+                <div style="font-size:11px; color:#A08070; margin-bottom:4px;">До разблокировки: 253 ✦</div>
+                <div class="prog-track">
+                    <div class="prog-fill" style="width:49%"></div>
+                </div>
+            </div>
+            <span style="font-size:22px; cursor:pointer;">⚙️</span>
+        </div>
+    </div>
+
+    <!-- SKY -->
+    <div class="section">
+        <div class="section-title">Фон игрового экрана</div>
+        <div class="sky-preview">
+            ☁️ &nbsp;&nbsp; ☀️ &nbsp;&nbsp; ☁️
+            <div class="sky-grass"></div>
+        </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="section">
+        <div class="section-title">Прогресс-бар</div>
+        <div class="progress-demo">
+            <div class="prog-label-row">
+                <div class="prog-label-text">🍓 До промокода</div>
+                <div class="prog-label-count">247 / 500</div>
+            </div>
+            <div class="prog-track" style="height:16px;">
+                <div class="prog-fill" style="width:49%"></div>
+            </div>
+            <div class="prog-hint">Отличная ферма! Ещё 253 очка до награды 🎁</div>
+        </div>
+    </div>
+
+    <!-- HARVEST MODAL -->
+    <div class="section">
+        <div class="section-title">Модалка сбора урожая</div>
+        <div class="modal-preview">
+            <span class="modal-icon">🍓</span>
+            <div class="modal-title">Урожай собран!</div>
+            <div class="modal-pts">+62 очка</div>
+            <div class="modal-sub">Свежая клубника в корзине 🧺</div>
+            <button class="btn btn-primary" style="width:100%">Забрать 🌱</button>
+        </div>
+    </div>
+
+    <!-- ONBOARDING -->
+    <div class="section">
+        <div class="section-title">Онбординг — слайд 3 (ключевой)</div>
+        <div class="card" style="text-align:center; padding:32px 24px;">
+            <div style="font-size:72px; margin-bottom:16px;">🚚</div>
+            <div class="t-h2" style="margin-bottom:10px;">Скоро —<br>настоящие продукты!</div>
+            <div class="t-warm" style="margin-bottom:16px;">Собирай урожай в игре<br>и получай настоящую клубнику домой</div>
+            <div class="early-badge">🌱 Игра в раннем доступе<br>Доставка появится в следующей версии</div>
+            <div style="margin-top:24px;">
+                <div class="onb-dots">
+                    <div class="onb-dot"></div>
+                    <div class="onb-dot"></div>
+                    <div class="onb-dot active"></div>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%; margin-top:20px;">🌱 Начать игру</button>
+        </div>
+    </div>
+
+</body>
+</html>

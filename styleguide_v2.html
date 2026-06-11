@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Ферма — Style Guide v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #F0EBE0;
+            color: #3D2B1F;
+            padding: 28px 18px 100px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        h1 { font-size: 26px; font-weight: 900; }
+        .page-sub { font-size: 13px; color: #9A7A60; margin-bottom: 36px; margin-top: 2px; }
+
+        .section { margin-bottom: 44px; }
+        .section-title {
+            font-size: 10px; font-weight: 900; letter-spacing: 1.8px;
+            text-transform: uppercase; color: #B09080;
+            margin-bottom: 14px; padding-bottom: 7px;
+            border-bottom: 2px solid #E0D4C4;
+        }
+
+        .card {
+            background: #FFF8EE;
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.08);
+        }
+
+        /* ── TIME OF DAY ── */
+        .sky-wrap {
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+            height: 160px;
+            transition: background 0.8s ease;
+        }
+
+        .sky-morning  { background: linear-gradient(180deg, #FFDEA8 0%, #FFF5D6 50%, #C8E8B8 100%); }
+        .sky-day      { background: linear-gradient(180deg, #B8D8F8 0%, #E0F0FF 50%, #C8E8B8 100%); }
+        .sky-evening  { background: linear-gradient(180deg, #FF9860 0%, #FFCF88 50%, #D4E890 100%); }
+        .sky-night    { background: linear-gradient(180deg, #1A2550 0%, #2C3878 50%, #3A5828 100%); }
+
+        .sky-content {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 4px;
+        }
+
+        .sky-emoji { font-size: 36px; transition: all 0.5s; }
+        .sky-label { font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.9); text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+        .sky-time  { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); }
+
+        .sky-particles {
+            position: absolute; inset: 0;
+            pointer-events: none; overflow: hidden;
+        }
+
+        .firefly {
+            position: absolute;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: #FFFF99;
+            animation: ff 3s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes ff {
+            0%,100% { opacity: 0; transform: translate(0,0); }
+            50% { opacity: 1; transform: translate(8px, -10px); }
+        }
+
+        .rain-drop {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, #88CCFF);
+            border-radius: 1px;
+            animation: rain-fall 1s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes rain-fall {
+            from { transform: translateY(-20px); opacity: 0.7; }
+            to   { transform: translateY(170px); opacity: 0; }
+        }
+
+        .sky-grass-strip {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 28px;
+        }
+
+        .sky-morning .sky-grass-strip { background: linear-gradient(180deg, #7AC84A, #4A8820); }
+        .sky-day .sky-grass-strip     { background: linear-gradient(180deg, #5A9E3A, #3A7020); }
+        .sky-evening .sky-grass-strip { background: linear-gradient(180deg, #5A8830, #384018); }
+        .sky-night .sky-grass-strip   { background: linear-gradient(180deg, #2A5018, #182810); }
+
+        .time-tabs {
+            display: flex; gap: 8px; margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .time-tab {
+            padding: 7px 14px;
+            border-radius: 12px;
+            border: 2px solid #E0D0C0;
+            background: #FFF8EE;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px; font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #7A5C44;
+        }
+
+        .time-tab.active {
+            background: #3D2B1F;
+            color: white;
+            border-color: #3D2B1F;
+        }
+
+        /* ── PLANT MOODS ── */
+        .moods-row {
+            display: flex; gap: 12px; flex-wrap: wrap;
+        }
+
+        .mood-bed {
+            flex: 1; min-width: 90px;
+            aspect-ratio: 1;
+            border-radius: 18px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 4px; position: relative; overflow: hidden;
+            cursor: pointer;
+        }
+
+        .mood-happy {
+            background: #5A9E3A;
+            box-shadow: 0 5px 0 #3A7020, 0 6px 16px rgba(90,158,58,0.4);
+            animation: happy-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes happy-glow {
+            0%,100% { box-shadow: 0 5px 0 #3A7020, 0 6px 16px rgba(90,158,58,0.3); }
+            50%      { box-shadow: 0 5px 0 #3A7020, 0 6px 28px rgba(90,158,58,0.7); }
+        }
+
+        .mood-neutral {
+            background: #7A8E3A;
+            box-shadow: 0 5px 0 #506020, 0 6px 14px rgba(0,0,0,0.2);
+        }
+
+        .mood-sad {
+            background: #8B7050;
+            box-shadow: 0 5px 0 #5C4830, 0 6px 14px rgba(0,0,0,0.2);
+            animation: sad-droop 4s ease-in-out infinite;
+        }
+
+        @keyframes sad-droop {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(2px); }
+        }
+
+        .mood-almost {
+            background: #8B5E3C;
+            box-shadow: 0 5px 0 #5C3820, 0 6px 20px rgba(245,197,66,0.4);
+            animation: pulse-gold 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-gold {
+            0%,100% { box-shadow: 0 5px 0 #5C3820, 0 6px 16px rgba(245,197,66,0.2); }
+            50%      { box-shadow: 0 5px 0 #5C3820, 0 6px 32px rgba(245,197,66,0.8); }
+        }
+
+        .mood-icon  { font-size: 34px; z-index: 1; position: relative; }
+        .mood-label { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.9); z-index: 1; }
+
+        .butterfly {
+            position: absolute; top: 8px; right: 10px;
+            font-size: 14px;
+            animation: flutter 1.5s ease-in-out infinite;
+        }
+
+        @keyframes flutter {
+            0%,100% { transform: translateY(0) rotate(-5deg); }
+            50%      { transform: translateY(-4px) rotate(5deg); }
+        }
+
+        .sad-droop-anim { animation: leaf-droop 3s ease-in-out infinite; }
+
+        @keyframes leaf-droop {
+            0%,100% { transform: rotate(0deg) translateY(0); }
+            50%      { transform: rotate(-5deg) translateY(2px); }
+        }
+
+        .gold-pulse-ring {
+            position: absolute; inset: -4px;
+            border-radius: 22px;
+            border: 3px solid rgba(245,197,66,0.6);
+            animation: ring-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes ring-pulse {
+            0%,100% { opacity: 0.3; transform: scale(1); }
+            50%      { opacity: 1;   transform: scale(1.04); }
+        }
+
+        /* ── PET ── */
+        .pet-section {
+            display: flex; gap: 14px;
+        }
+
+        .pet-card {
+            flex: 1;
+            background: #FFF8EE;
+            border-radius: 20px;
+            padding: 16px 12px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .pet-body { font-size: 48px; display: block; }
+        .pet-state-label { font-size: 11px; font-weight: 800; color: #A08060; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .pet-text { font-size: 12px; font-weight: 700; color: #3D2B1F; margin-top: 4px; line-height: 1.4; }
+
+        .pet-idle   .pet-body { animation: idle-breath 3s ease-in-out infinite; }
+        .pet-happy  .pet-body { animation: pet-jump 0.6s ease-in-out infinite; }
+        .pet-sad    .pet-body { animation: sad-sag 4s ease-in-out infinite; }
+
+        @keyframes idle-breath {
+            0%,100% { transform: scale(1); }
+            50%      { transform: scale(1.05); }
+        }
+
+        @keyframes pet-jump {
+            0%,100% { transform: translateY(0) rotate(0); }
+            30%      { transform: translateY(-8px) rotate(-8deg); }
+            60%      { transform: translateY(-4px) rotate(6deg); }
+        }
+
+        @keyframes sad-sag {
+            0%,100% { transform: translateY(0) rotate(0deg); }
+            50%      { transform: translateY(3px) rotate(-3deg); }
+        }
+
+        .heart-float {
+            font-size: 16px;
+            animation: heart-up 1.5s ease-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes heart-up {
+            0%   { opacity: 0;   transform: translateY(0); }
+            30%  { opacity: 1; }
+            100% { opacity: 0;   transform: translateY(-20px); }
+        }
+
+        .speech-bubble {
+            background: white;
+            border-radius: 12px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #3D2B1F;
+            border: 2px solid #F0E4D0;
+            position: relative;
+            margin-top: 8px;
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: #F0E4D0;
+        }
+
+        /* ── GROWTH TREE ── */
+        .tree-row {
+            display: flex; gap: 10px;
+        }
+
+        .tree-card {
+            flex: 1;
+            background: #FFF8EE;
+            border-radius: 16px;
+            padding: 14px 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        }
+
+        .tree-icon { font-size: 36px; display: block; }
+        .tree-range { font-size: 10px; font-weight: 800; color: #A08060; margin-top: 4px; }
+        .tree-name  { font-size: 11px; font-weight: 700; color: #3D2B1F; margin-top: 2px; }
+
+        /* ── HARVEST MODAL ── */
+        .modal-card {
+            background: white;
+            border-radius: 28px;
+            padding: 28px 24px;
+            text-align: center;
+            box-shadow: 0 10px 36px rgba(0,0,0,0.15);
+        }
+
+        .modal-tabs {
+            display: flex;
+            background: #F5EDE0;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .modal-tab {
+            flex: 1;
+            padding: 8px;
+            border-radius: 10px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px; font-weight: 800;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #9A7A60;
+            transition: all 0.2s;
+        }
+
+        .modal-tab.active {
+            background: white;
+            color: #3D2B1F;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .harvest-icon { font-size: 64px; display: block; }
+        .harvest-pts  { font-size: 42px; font-weight: 900; color: #E8453C; animation: pts-bounce 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+        @keyframes pts-bounce {
+            from { transform: scale(0.5); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .golden-harvest { background: linear-gradient(135deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .postcard {
+            background: linear-gradient(135deg, #8B5E3C 0%, #6B4020 100%);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .postcard::before {
+            content: '🌿🍓🌿';
+            position: absolute;
+            top: 8px; left: 0; right: 0;
+            font-size: 18px;
+            letter-spacing: 6px;
+            opacity: 0.4;
+        }
+
+        .postcard-emoji { font-size: 48px; display: block; margin-bottom: 8px; }
+        .postcard-title { font-size: 18px; font-weight: 900; color: white; }
+        .postcard-sub   { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+        .btn {
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px; font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.12s;
+        }
+        .btn:active { transform: scale(0.96); }
+
+        .btn-primary { background: #E8453C; color: white; box-shadow: 0 5px 0 #B53028; margin-bottom: 10px; }
+        .btn-social  { background: #FFF0E8; color: #C84018; border: 2px solid #F5C8A8; }
+
+        /* ── GIFT BOX ── */
+        .gift-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .gift-icon-wrap {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #E8453C, #FF7858);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 6px 0 #B53028, 0 8px 20px rgba(232,69,60,0.35);
+            animation: gift-wiggle 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes gift-wiggle {
+            0%,100% { transform: rotate(0deg); }
+            20%      { transform: rotate(-6deg); }
+            40%      { transform: rotate(6deg); }
+            60%      { transform: rotate(-3deg); }
+            80%      { transform: rotate(3deg); }
+        }
+
+        .gift-shine {
+            position: absolute; top: 8px; left: 12px;
+            font-size: 14px;
+            animation: shine 2s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0%,100% { opacity: 0; transform: scale(0.5); }
+            50%      { opacity: 1; transform: scale(1.2); }
+        }
+
+        .gift-label { font-size: 13px; font-weight: 800; color: #3D2B1F; }
+        .gift-sub   { font-size: 11px; font-weight: 700; color: #9A7A60; }
+
+        /* ── NEIGHBOR ── */
+        .neighbor-corner {
+            background: #FFF8EE;
+            border-radius: 18px;
+            padding: 14px 16px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            cursor: pointer;
+        }
+
+        .neighbor-avatars {
+            display: flex;
+        }
+
+        .neighbor-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 3px solid #FFF8EE;
+            font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+            background: #E8D8C8;
+        }
+
+        .neighbor-avatar:nth-child(2) { margin-left: -10px; }
+        .neighbor-avatar:nth-child(3) { margin-left: -10px; }
+
+        .neighbor-text .n-main { font-size: 13px; font-weight: 800; color: #3D2B1F; }
+        .neighbor-text .n-sub  { font-size: 11px; font-weight: 700; color: #9A7A60; }
+
+        /* ── ACTION BAR ── */
+        .action-bar {
+            display: flex; gap: 8px;
+        }
+
+        .ab-btn {
+            flex: 1;
+            padding: 11px 4px;
+            border-radius: 16px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-size: 11px; font-weight: 800;
+            cursor: pointer;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 4px;
+            transition: transform 0.12s;
+        }
+        .ab-btn:active { transform: scale(0.93); }
+        .ab-btn .icon { font-size: 24px; }
+
+        .ab-plant  { background: #EDF7E5; color: #3A7020; box-shadow: 0 3px 0 #C0E0A0; }
+        .ab-water  { background: #E3F4FF; color: #1A6EA8; box-shadow: 0 3px 0 #A8D8F0; }
+        .ab-stats  { background: #FFF3E0; color: #A05010; box-shadow: 0 3px 0 #F0D8A0; }
+        .ab-gift   { background: #FFF0F0; color: #C84018; box-shadow: 0 3px 0 #F0C8B8; }
+
+        /* ── COLORS ── */
+        .colors-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .color-chip { border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .color-swatch { height: 56px; }
+        .color-info { background: white; padding: 8px 10px; }
+        .color-name { font-size: 10px; font-weight: 800; color: #3D2B1F; }
+        .color-hex  { font-size: 9px; color: #A08070; font-family: monospace; }
+
+        /* ── BRAG WALL ── */
+        .brag-wall {
+            background: linear-gradient(135deg, #8B6038, #6B4420);
+            border-radius: 20px;
+            padding: 18px;
+            position: relative;
+        }
+
+        .brag-title { font-size: 14px; font-weight: 900; color: rgba(255,255,255,0.9); margin-bottom: 14px; }
+
+        .medals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+        .medal {
+            background: rgba(255,255,255,0.15);
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .medal.earned { background: rgba(245,197,66,0.25); border-color: rgba(245,197,66,0.6); }
+        .medal.earned .medal-icon { filter: none; }
+        .medal .medal-icon { font-size: 24px; filter: grayscale(1) opacity(0.4); display: block; }
+        .medal.earned .medal-icon { filter: none; }
+        .medal-name { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); margin-top: 4px; }
+        .medal.earned .medal-name { color: rgba(255,255,255,0.95); }
+
+        /* ── SECTION INTRO ── */
+        .section-new { position: relative; }
+        .new-badge {
+            display: inline-block;
+            background: #E8453C;
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 2px 7px;
+            border-radius: 8px;
+            margin-left: 8px;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+        }
+
+        hr.divider { border: none; border-top: 2px solid #E0D4C4; margin: 44px 0; }
+    </style>
+</head>
+<body>
+
+<h1>AR Ферма 🌱</h1>
+<div class="page-sub">Style Guide v2 — Живая ферма</div>
+
+<!-- COLORS -->
+<div class="section">
+    <div class="section-title">Палитра</div>
+    <div class="colors-grid">
+        <div class="color-chip"><div class="color-swatch" style="background:#8B5E3C"></div><div class="color-info"><div class="color-name">Земля</div><div class="color-hex">#8B5E3C</div></div></div>
+        <div class="color-chip"><div class="color-swatch" style="background:#5A9E3A"></div><div class="color-info"><div class="color-name">Трава</div><div class="color-hex">#5A9E3A</div></div></div>
+        <div class="color-chip"><div class="color-swatch" style="background:#E8453C"></div><div class="color-info"><div class="color-name">Акцент</div><div class="color-hex">#E8453C</div></div></div>
+        <div class="color-chip"><div class="color-swatch" style="background:#4AADE8"></div><div class="color-info"><div class="color-name">Вода</div><div class="color-hex">#4AADE8</div></div></div>
+        <div class="color-chip"><div class="color-swatch" style="background:#F5C542"></div><div class="color-info"><div class="color-name">Очки</div><div class="color-hex">#F5C542</div></div></div>
+        <div class="color-chip"><div class="color-swatch" style="background:#E8F4C8"></div><div class="color-info"><div class="color-name">Небо</div><div class="color-hex">#E8F4C8</div></div></div>
+        <div class="color-chip"><div class="color-swatch" style="background:#FFF8EE"></div><div class="color-info"><div class="color-name">Карточка</div><div class="color-hex">#FFF8EE</div></div></div>
+        <div class="color-chip"><div class="color-swatch" style="background:#3D2B1F"></div><div class="color-info"><div class="color-name">Текст</div><div class="color-hex">#3D2B1F</div></div></div>
+    </div>
+</div>
+
+<!-- TIME OF DAY -->
+<div class="section section-new">
+    <div class="section-title">Смена времени суток <span class="new-badge">NEW</span></div>
+    <div class="time-tabs">
+        <button class="time-tab" onclick="setTime('morning')">🌅 Утро</button>
+        <button class="time-tab active" onclick="setTime('day')">☀️ День</button>
+        <button class="time-tab" onclick="setTime('evening')">🌇 Вечер</button>
+        <button class="time-tab" onclick="setTime('night')">🌙 Ночь</button>
+    </div>
+    <div class="sky-wrap sky-day" id="sky">
+        <div class="sky-particles" id="sky-particles"></div>
+        <div class="sky-content">
+            <div class="sky-emoji" id="sky-emoji">☀️ ☁️</div>
+            <div class="sky-label" id="sky-label">Солнечный день</div>
+            <div class="sky-time" id="sky-time">12:00 — 18:00</div>
+        </div>
+        <div class="sky-grass-strip"></div>
+    </div>
+</div>
+
+<!-- PLANT MOODS -->
+<div class="section section-new">
+    <div class="section-title">Настроение растений <span class="new-badge">NEW</span></div>
+    <div class="moods-row">
+        <div class="mood-bed mood-happy">
+            <div class="butterfly">🦋</div>
+            <div class="mood-icon">🌿</div>
+            <div class="mood-label">Счастлива</div>
+        </div>
+        <div class="mood-bed mood-neutral">
+            <div class="mood-icon">🌿</div>
+            <div class="mood-label">Нейтральна</div>
+        </div>
+        <div class="mood-bed mood-sad">
+            <div class="mood-icon sad-droop-anim">🌿</div>
+            <div class="mood-label">Ждёт тебя</div>
+        </div>
+        <div class="mood-bed mood-almost">
+            <div class="gold-pulse-ring"></div>
+            <div class="mood-icon">🍓</div>
+            <div class="mood-label">Скоро-скоро!</div>
+        </div>
+    </div>
+</div>
+
+<!-- PET COMPANION -->
+<div class="section section-new">
+    <div class="section-title">Питомец-компаньон <span class="new-badge">NEW</span></div>
+    <div class="pet-section">
+        <div class="pet-card pet-idle">
+            <span class="pet-body">🦔</span>
+            <div class="pet-state-label">Idle</div>
+            <div class="pet-text">Гуляет по ферме</div>
+        </div>
+        <div class="pet-card pet-happy">
+            <span class="pet-body">🦔</span>
+            <span class="heart-float">❤️</span>
+            <div class="pet-state-label">Радость</div>
+            <div class="pet-text">После сбора урожая</div>
+        </div>
+        <div class="pet-card pet-sad">
+            <span class="pet-body">🦔</span>
+            <div class="speech-bubble">Скучал… 🍓</div>
+            <div class="pet-state-label">Скучает</div>
+            <div class="pet-text">Давно не заходила</div>
+        </div>
+    </div>
+</div>
+
+<!-- GROWTH TREE -->
+<div class="section section-new">
+    <div class="section-title">Дерево роста фермера <span class="new-badge">NEW</span></div>
+    <div class="tree-row">
+        <div class="tree-card">
+            <span class="tree-icon">🌱</span>
+            <div class="tree-range">0–100 ✦</div>
+            <div class="tree-name">Росток</div>
+        </div>
+        <div class="tree-card">
+            <span class="tree-icon">🌿</span>
+            <div class="tree-range">100–300 ✦</div>
+            <div class="tree-name">Деревце</div>
+        </div>
+        <div class="tree-card">
+            <span class="tree-icon">🌸</span>
+            <div class="tree-range">300–500 ✦</div>
+            <div class="tree-name">Цветёт</div>
+        </div>
+        <div class="tree-card" style="background:#FFF3E0; box-shadow: 0 3px 16px rgba(245,197,66,0.3);">
+            <span class="tree-icon">🌳</span>
+            <div class="tree-range" style="color:#D4820A;">500+ ✦</div>
+            <div class="tree-name" style="color:#A05010; font-weight:900;">С гнездом!</div>
+        </div>
+    </div>
+</div>
+
+<!-- ACTION BAR -->
+<div class="section section-new">
+    <div class="section-title">Панель действий <span class="new-badge">NEW</span></div>
+    <div class="action-bar">
+        <button class="ab-btn ab-plant"><span class="icon">🌱</span>Посадить</button>
+        <button class="ab-btn ab-water"><span class="icon">💧</span>Полив</button>
+        <button class="ab-btn ab-stats"><span class="icon">📊</span>Статус</button>
+        <button class="ab-btn ab-gift"><span class="icon">🎁</span>Подарить</button>
+    </div>
+</div>
+
+<!-- NEIGHBOR -->
+<div class="section section-new">
+    <div class="section-title">Соседский уголок <span class="new-badge">NEW</span></div>
+    <div class="neighbor-corner">
+        <div class="neighbor-avatars">
+            <div class="neighbor-avatar">👩</div>
+            <div class="neighbor-avatar">👱‍♀️</div>
+            <div class="neighbor-avatar">👩‍🦰</div>
+        </div>
+        <div class="neighbor-text">
+            <div class="n-main">Оля собрала 20 ягод сегодня 🍓</div>
+            <div class="n-sub">Твоя очередь! → Смотреть ферму</div>
+        </div>
+    </div>
+</div>
+
+<!-- DAILY GIFT -->
+<div class="section section-new">
+    <div class="section-title">Ежедневный подарок <span class="new-badge">NEW</span></div>
+    <div class="card" style="display:flex; align-items:center; gap:20px;">
+        <div class="gift-box">
+            <div class="gift-icon-wrap">
+                🎁
+                <span class="gift-shine">✨</span>
+            </div>
+            <div class="gift-label">У калитки!</div>
+            <div class="gift-sub">Каждые 24 часа</div>
+        </div>
+        <div style="flex:1; font-size:14px; font-weight:700; color:#3D2B1F; line-height:1.6;">
+            Коробка с лентой ждёт у калитки. Нажми — сюрприз выпрыгнет!
+            <div style="margin-top:8px; font-size:12px; color:#9A7A60;">семена · бонусные очки · декор</div>
+        </div>
+    </div>
+</div>
+
+<!-- HARVEST MODAL -->
+<div class="section section-new">
+    <div class="section-title">Модалка сбора — обновлённая <span class="new-badge">NEW</span></div>
+    <div class="modal-card">
+        <div class="modal-tabs">
+            <button class="modal-tab active" onclick="switchTab('points', this)">🌾 Очки</button>
+            <button class="modal-tab" onclick="switchTab('postcard', this)">📸 Открытка</button>
+        </div>
+        <div id="tab-points" class="tab-content active">
+            <span class="harvest-icon">🍓</span>
+            <div style="font-size:20px; font-weight:900; color:#3D2B1F; margin:10px 0 4px;">Урожай собран!</div>
+            <div class="harvest-pts">+62 очка</div>
+            <div style="font-size:13px; color:#9A7A60; margin:6px 0 20px;">Клубника в корзине 🧺</div>
+            <button class="btn btn-primary">Забрать 🌱</button>
+            <button class="btn btn-social">Отправить подруге 🎁</button>
+        </div>
+        <div id="tab-postcard" class="tab-content">
+            <div class="postcard">
+                <span class="postcard-emoji">🍓</span>
+                <div class="postcard-title">Урожай Тимур</div>
+                <div class="postcard-sub">9 июня 2026 · AR Ферма</div>
+            </div>
+            <div style="font-size:12px; color:#9A7A60; margin:12px 0 16px; text-align:center;">Сохрани или поделись с подругой</div>
+            <button class="btn btn-primary">Поделиться 📤</button>
+        </div>
+    </div>
+</div>
+
+<!-- BRAG WALL -->
+<div class="section section-new">
+    <div class="section-title">Доска гордости <span class="new-badge">NEW</span></div>
+    <div class="brag-wall">
+        <div class="brag-title">📌 Доска фермера</div>
+        <div class="medals-grid">
+            <div class="medal earned"><span class="medal-icon">🍓</span><div class="medal-name">Первый урожай</div></div>
+            <div class="medal earned"><span class="medal-icon">💧</span><div class="medal-name">50 поливов</div></div>
+            <div class="medal"><span class="medal-icon">🎁</span><div class="medal-name">Первый продукт</div></div>
+            <div class="medal"><span class="medal-icon">⭐</span><div class="medal-name">500 очков</div></div>
+            <div class="medal"><span class="medal-icon">❤️</span><div class="medal-name">Подарок подруге</div></div>
+            <div class="medal"><span class="medal-icon">🌳</span><div class="medal-name">Большое дерево</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const timeConfig = {
+    morning: { bg: 'sky-morning', emoji: '🌅 ☁️', label: 'Туман и роса', time: '6:00 — 12:00' },
+    day:     { bg: 'sky-day',     emoji: '☀️ ☁️', label: 'Солнечный день', time: '12:00 — 18:00' },
+    evening: { bg: 'sky-evening', emoji: '🌇 🌤️', label: 'Закатные лучи', time: '18:00 — 22:00' },
+    night:   { bg: 'sky-night',   emoji: '🌙 ✨', label: 'Тихая ночь', time: '22:00 — 6:00' }
+};
+
+function setTime(t) {
+    const sky = document.getElementById('sky');
+    const cfg = timeConfig[t];
+    sky.className = 'sky-wrap ' + cfg.bg;
+    document.getElementById('sky-emoji').textContent = cfg.emoji;
+    document.getElementById('sky-label').textContent = cfg.label;
+    document.getElementById('sky-time').textContent = cfg.time;
+
+    document.querySelectorAll('.time-tab').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const particles = document.getElementById('sky-particles');
+    particles.innerHTML = '';
+
+    if (t === 'night') {
+        for (let i = 0; i < 8; i++) {
+            const ff = document.createElement('div');
+            ff.className = 'firefly';
+            ff.style.cssText = `left:${10 + Math.random()*80}%; top:${10 + Math.random()*60}%; animation-delay:${Math.random()*3}s; animation-duration:${2+Math.random()*2}s`;
+            particles.appendChild(ff);
+        }
+    }
+    if (t === 'morning') {
+        for (let i = 0; i < 12; i++) {
+            const drop = document.createElement('div');
+            drop.className = 'rain-drop';
+            drop.style.cssText = `left:${Math.random()*100}%; height:${8+Math.random()*12}px; animation-delay:${Math.random()*1}s; animation-duration:${0.8+Math.random()*0.4}s; opacity:0.3`;
+            particles.appendChild(drop);
+        }
+    }
+}
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    btn.classList.add('active');
+}
+</script>
+</body>
+</html>

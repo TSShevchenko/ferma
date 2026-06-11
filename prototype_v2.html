@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>AR Ферма 🌱</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+:root{
+  --red:#E8453C;--red-dark:#B53028;
+  --green:#5A9E3A;--green-dark:#3A7020;
+  --blue:#4AADE8;--blue-dark:#2A7DB8;
+  --brown:#8B5E3C;--brown-dark:#5C3820;
+  --gold:#F5C542;--gold-dark:#D4820A;
+  --cream:#FFF8EE;--bg:#F0EBE0;
+  --text:#3D2B1F;--text-mid:#7A5C44;--text-light:#A08060;
+}
+
+html{height:100%}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  display:flex;justify-content:center;
+  min-height:100%;margin:0;
+}
+
+#app{
+  width:100%;max-width:390px;
+  height:100vh;
+  position:relative;overflow:hidden;
+  background:var(--cream);
+}
+
+/* ══════════ SCREENS ══════════ */
+.screen{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  display:flex;flex-direction:column;align-items:center;
+  transition:opacity .35s,transform .35s;
+}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateX(24px)}
+
+/* ══════════ SPLASH ══════════ */
+#splash{
+  background:linear-gradient(160deg,#FFDEA8 0%,#FFF5D0 45%,#C8E8B0 100%);
+  justify-content:center;gap:14px;
+}
+.splash-logo{font-size:80px;animation:float 2.2s ease-in-out infinite alternate}
+@keyframes float{from{transform:translateY(0)}to{transform:translateY(-14px)}}
+.splash-title{font-size:36px;font-weight:900;color:#3A7020;letter-spacing:-1px}
+.splash-sub{font-size:14px;color:var(--text-mid)}
+.splash-bar-wrap{margin-top:20px;width:140px;height:4px;background:rgba(0,0,0,.1);border-radius:2px;overflow:hidden}
+.splash-bar{height:100%;background:var(--green);border-radius:2px;animation:load 2.2s ease-out forwards}
+@keyframes load{from{width:0}to{width:100%}}
+
+/* ══════════ ONBOARDING ══════════ */
+#onboarding{
+  background:linear-gradient(170deg,#F0FFF0 0%,#FFFAED 100%);
+  justify-content:flex-end;padding-bottom:44px;
+}
+.onb-slides{position:absolute;inset:0;bottom:160px;overflow:hidden}
+.onb-slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 28px;gap:16px;
+  opacity:0;transform:translateX(48px);transition:all .4s ease;
+}
+.onb-slide.active{opacity:1;transform:translateX(0)}
+.onb-slide.out{opacity:0;transform:translateX(-48px)}
+.onb-big{font-size:80px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.12))}
+.onb-title{font-size:26px;font-weight:900;color:var(--text);text-align:center;line-height:1.3}
+.onb-desc{font-size:15px;color:var(--text-mid);text-align:center;line-height:1.7}
+.onb-steps{display:flex;align-items:center;gap:10px;font-size:30px}
+.onb-arr{font-size:16px;color:var(--green)}
+.onb-badge{
+  background:#FFF3CD;border:2px solid var(--gold);
+  border-radius:14px;padding:10px 16px;
+  font-size:13px;font-weight:700;color:#7B5800;
+  text-align:center;line-height:1.6;
+}
+.onb-social-row{display:flex;gap:-8px;justify-content:center;font-size:40px}
+
+.onb-footer{width:100%;padding:0 28px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.onb-dots{display:flex;gap:8px;margin-bottom:2px}
+.onb-dot{width:8px;height:8px;border-radius:50%;background:#D0C0B0;transition:all .3s}
+.onb-dot.active{background:var(--red);width:24px;border-radius:4px}
+
+.btn-primary{
+  width:100%;padding:16px;border-radius:18px;border:none;
+  background:var(--red);color:white;
+  font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;
+  cursor:pointer;
+  box-shadow:0 5px 0 var(--red-dark),0 7px 18px rgba(232,69,60,.3);
+  transition:transform .12s,box-shadow .12s;
+}
+.btn-primary:active{transform:scale(.97) translateY(3px);box-shadow:0 2px 0 var(--red-dark)}
+.btn-ghost{background:none;border:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text-light);cursor:pointer;padding:8px}
+
+/* ══════════ GAME ══════════ */
+#game{justify-content:flex-start}
+
+/* TOP BAR */
+.top-bar{
+  width:100%;padding:48px 16px 12px;
+  background:white;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.07);
+  position:relative;z-index:10;
+}
+.score-pill{
+  display:flex;align-items:center;gap:5px;
+  background:#FFF8E1;border:2.5px solid var(--gold);
+  padding:6px 13px;border-radius:22px;
+  white-space:nowrap;
+}
+.score-val{font-size:17px;font-weight:900;color:var(--gold-dark)}
+.prog-col{flex:1}
+.prog-lbl{font-size:10px;color:var(--text-light);margin-bottom:3px}
+.prog-bg{height:8px;background:#EEE;border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--red),#F5A623);border-radius:4px;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+.top-icon{font-size:22px;cursor:pointer;background:none;border:none;padding:2px}
+
+/* SKY */
+.sky{
+  width:100%;height:80px;position:relative;overflow:hidden;
+  transition:background 1.5s;
+  display:flex;align-items:center;padding:0 16px;
+}
+.sky-particles{position:absolute;inset:0;pointer-events:none}
+.sky-sun{position:absolute;right:20px;top:12px;font-size:30px;animation:sun-glow 4s ease-in-out infinite alternate}
+@keyframes sun-glow{from{filter:drop-shadow(0 0 4px rgba(255,200,0,.4))}to{filter:drop-shadow(0 0 16px rgba(255,200,0,.9))}}
+.sky-cloud{position:absolute;font-size:26px;animation:drift 16s linear infinite}
+.sky-c1{top:10px;left:-40px}
+.sky-c2{top:28px;left:-70px;font-size:20px;animation-duration:22s;animation-delay:-9s}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(430px)}}
+.firefly{position:absolute;width:4px;height:4px;border-radius:50%;background:#FFFF88;animation:ff 3s ease-in-out infinite;opacity:0}
+@keyframes ff{0%,100%{opacity:0;transform:translate(0,0)}50%{opacity:1;transform:translate(8px,-10px)}}
+.grass{width:100%;height:22px;box-shadow:0 3px 0 #2A6010}
+
+/* FARM AREA */
+.farm-area{flex:1;width:100%;padding:14px 14px 8px;display:flex;flex-direction:column;gap:10px;overflow:hidden;position:relative}
+
+/* TREE */
+.tree-bg{position:absolute;right:14px;top:8px;font-size:48px;opacity:.35;pointer-events:none;transition:all .5s}
+
+/* GIFT BOX */
+.gift-at-gate{
+  position:absolute;left:14px;top:14px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;animation:gift-wig 2s ease-in-out infinite;z-index:5;
+}
+@keyframes gift-wig{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.gift-box-icon{font-size:36px;filter:drop-shadow(0 3px 6px rgba(232,69,60,.4))}
+.gift-box-label{font-size:9px;font-weight:900;color:var(--red);background:white;padding:1px 6px;border-radius:6px;border:2px solid var(--red)}
+
+/* PET */
+.pet-wrap{
+  position:absolute;left:50%;bottom:0;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;
+}
+.pet-icon{font-size:28px;animation:pet-idle 3s ease-in-out infinite}
+@keyframes pet-idle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.06) rotate(3deg)}}
+.pet-bubble{
+  background:white;border:2px solid #F0E4D0;border-radius:10px;
+  padding:4px 8px;font-size:11px;font-weight:700;color:var(--text);
+  margin-bottom:2px;position:relative;white-space:nowrap;
+}
+.pet-bubble::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#F0E4D0}
+
+/* BEDS */
+.beds-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bed{
+  aspect-ratio:1;border-radius:18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .12s;
+  box-shadow:0 5px 0 var(--brown-dark),0 6px 12px rgba(0,0,0,.18);
+}
+.bed::after{content:'';position:absolute;inset:0;border-radius:18px;background:linear-gradient(160deg,rgba(255,255,255,.14) 0%,transparent 55%);pointer-events:none}
+.bed:active{transform:scale(.93) translateY(3px);box-shadow:0 2px 0 var(--brown-dark)}
+.bed-empty {background:#8B5E3C}
+.bed-seed  {background:#7A5030}
+.bed-sprout{background:#5A9E3A;box-shadow:0 5px 0 #3A7020,0 6px 12px rgba(90,158,58,.25)}
+.bed-flower{background:#9B7EC8;box-shadow:0 5px 0 #7058A0,0 6px 12px rgba(155,126,200,.25)}
+.bed-ready {background:var(--red);box-shadow:0 5px 0 var(--red-dark),0 6px 20px rgba(232,69,60,.4);animation:bed-pulse 1.8s ease-in-out infinite}
+@keyframes bed-pulse{0%,100%{box-shadow:0 5px 0 var(--red-dark),0 6px 16px rgba(232,69,60,.3)}50%{box-shadow:0 5px 0 var(--red-dark),0 6px 30px rgba(232,69,60,.7)}}
+
+/* Mood overlays */
+.bed.mood-sad{filter:saturate(.65) brightness(.9)}
+.bed.mood-almost{animation:bed-gold-pulse 1.5s ease-in-out infinite}
+@keyframes bed-gold-pulse{0%,100%{box-shadow:0 5px 0 var(--brown-dark),0 6px 16px rgba(245,197,66,.2)}50%{box-shadow:0 5px 0 var(--brown-dark),0 6px 32px rgba(245,197,66,.8)}}
+
+.bed-plant{font-size:32px;z-index:1;transition:transform .25s}
+.bed.bed-ready .bed-plant{animation:bob .9s ease-in-out infinite alternate}
+@keyframes bob{from{transform:scale(1)}to{transform:scale(1.12) translateY(-2px)}}
+.bed-label{font-size:9px;font-weight:800;color:rgba(255,255,255,.8);z-index:1}
+.bed-timer{font-size:11px;font-weight:800;color:rgba(255,255,255,.95);background:rgba(0,0,0,.22);padding:1px 7px;border-radius:7px;z-index:1}
+.bed-water{position:absolute;top:6px;right:7px;font-size:12px;opacity:0;transition:opacity .3s;z-index:2}
+.bed.watered .bed-water{opacity:1}
+.butterfly{position:absolute;top:6px;right:8px;font-size:12px;animation:flutter 1.5s ease-in-out infinite;z-index:2}
+@keyframes flutter{0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(5deg) translateY(-4px)}}
+
+/* NEIGHBOR */
+.neighbor-bar{
+  width:100%;padding:8px 14px;
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;
+}
+.nb-avatars{display:flex}
+.nb-av{width:28px;height:28px;border-radius:50%;background:#E8D8C8;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white}
+.nb-av+.nb-av{margin-left:-8px}
+.nb-text{font-size:12px;font-weight:700;color:var(--text-mid)}
+.nb-sub{font-size:10px;color:var(--text-light)}
+
+/* ACTION BAR */
+.action-bar{
+  width:100%;padding:8px 12px 28px;background:white;
+  box-shadow:0 -3px 12px rgba(0,0,0,.07);
+  display:flex;gap:8px;
+}
+.ab{
+  flex:1;padding:10px 4px;border-radius:15px;border:none;
+  font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;
+  transition:transform .12s;
+}
+.ab:active{transform:scale(.92)}
+.ab .ic{font-size:24px}
+.ab-plant{background:#EDF7E5;color:#3A7020;box-shadow:0 3px 0 #C0E0A0}
+.ab-water{background:#E3F4FF;color:#1A6EA8;box-shadow:0 3px 0 #A8D8F0}
+.ab-water.on{background:#1E88E5;color:white;box-shadow:0 3px 0 #1560B0}
+.ab-stats{background:#FFF3E0;color:#A05010;box-shadow:0 3px 0 #F0D8A0}
+.ab-gift {background:#FFF0F0;color:#C84018;box-shadow:0 3px 0 #F0C8B8}
+
+/* ══════════ TUTORIAL ══════════ */
+#tutorial{position:fixed;inset:0;z-index:500;pointer-events:none}
+.tut-spot{position:absolute;border-radius:20px;box-shadow:0 0 0 9999px rgba(0,0,0,.6);pointer-events:auto}
+.tut-bubble{
+  position:absolute;background:#1A1A2E;color:white;
+  padding:12px 16px;border-radius:16px;font-size:14px;font-weight:700;line-height:1.6;
+  max-width:220px;pointer-events:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.tut-bubble.tip-down::before{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:#1A1A2E}
+.tut-bubble.tip-up::before{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);border:8px solid transparent;border-bottom-color:#1A1A2E}
+.tut-finger{position:absolute;font-size:28px;animation:tap 1.3s ease-in-out infinite;pointer-events:none;z-index:501}
+@keyframes tap{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.18) translateY(-4px)}}
+
+/* ══════════ MODALS ══════════ */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;
+  z-index:600;backdrop-filter:blur(3px);
+}
+.modal-card{
+  background:white;border-radius:30px;
+  padding:28px 24px;text-align:center;
+  width:min(320px,88vw);
+  box-shadow:0 20px 60px rgba(0,0,0,.22);
+  animation:pop-in .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes pop-in{from{transform:scale(.5) translateY(20px);opacity:0}to{transform:scale(1);opacity:1}}
+
+.modal-tabs{display:flex;background:#F5EDE0;border-radius:12px;padding:4px;margin-bottom:18px}
+.mtab{flex:1;padding:8px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;border:none;background:none;color:var(--text-light);transition:all .2s}
+.mtab.on{background:white;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.tab-pane{display:none}.tab-pane.on{display:block}
+
+.harvest-icon{font-size:64px;display:block}
+.harvest-pts{font-size:40px;font-weight:900;color:var(--red);animation:pts-pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pts-pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.harvest-pts.golden{background:linear-gradient(135deg,#FFD700,#FF8C00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.modal-sub{font-size:13px;color:var(--text-light);margin:5px 0 18px}
+.btn-social{
+  width:100%;padding:13px;border-radius:16px;border:2px solid #F5C8A8;
+  background:#FFF0E8;color:#C84018;font-family:'Nunito',sans-serif;
+  font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;
+  transition:transform .12s;
+}
+.btn-social:active{transform:scale(.96)}
+
+.postcard{
+  background:linear-gradient(135deg,#8B5E3C,#6B4020);
+  border-radius:16px;padding:20px 16px;text-align:center;
+  position:relative;overflow:hidden;margin-bottom:16px;
+}
+.postcard::before{content:'🌿🍓🌿';position:absolute;top:8px;left:0;right:0;font-size:16px;letter-spacing:6px;opacity:.35}
+.postcard-main{font-size:44px;display:block;margin-bottom:8px}
+.postcard-title{font-size:18px;font-weight:900;color:white}
+.postcard-date{font-size:12px;font-weight:700;color:rgba(255,255,255,.65);margin-top:3px}
+
+/* GIFT MODAL */
+.gift-modal-icon{font-size:72px;display:block;animation:gift-open 0.6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes gift-open{0%{transform:scale(.3) rotate(-20deg);opacity:0}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.gift-reward{font-size:28px;font-weight:900;color:var(--green-dark);margin:8px 0 4px}
+.gift-desc{font-size:14px;color:var(--text-light);margin-bottom:18px}
+
+/* STATS SHEET */
+.stats-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:600;backdrop-filter:blur(3px)}
+.stats-sheet{
+  background:white;border-radius:28px 28px 0 0;
+  padding:8px 22px 44px;
+  width:min(390px,100vw);
+  animation:slide-up .3s ease;
+  max-height:85vh;overflow-y:auto;
+}
+@keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:40px;height:4px;background:#E0E0E0;border-radius:2px;margin:12px auto 18px}
+.stats-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:16px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.stat-card{background:#F8F4EE;border-radius:16px;padding:14px;text-align:center}
+.stat-val{font-size:28px;font-weight:900;color:var(--green-dark)}
+.stat-lbl{font-size:11px;font-weight:700;color:var(--text-light);margin-top:2px}
+.tree-progress{background:#F8F4EE;border-radius:16px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.tree-phase{font-size:36px}
+.tree-info .tree-name{font-size:15px;font-weight:900;color:var(--text)}
+.tree-info .tree-hint{font-size:12px;font-weight:700;color:var(--text-light)}
+.brag-wall{background:linear-gradient(135deg,#8B6038,#6B4420);border-radius:16px;padding:14px 16px;margin-bottom:16px}
+.brag-title{font-size:13px;font-weight:900;color:rgba(255,255,255,.9);margin-bottom:10px}
+.medals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.medal{background:rgba(255,255,255,.12);border-radius:12px;padding:10px 6px;text-align:center;border:2px solid rgba(255,255,255,.15)}
+.medal.earned{background:rgba(245,197,66,.25);border-color:rgba(245,197,66,.6)}
+.medal-icon{font-size:22px;display:block;filter:grayscale(1) opacity(.35)}
+.medal.earned .medal-icon{filter:none}
+.medal-name{font-size:9px;font-weight:700;color:rgba(255,255,255,.6);margin-top:3px}
+.medal.earned .medal-name{color:rgba(255,255,255,.95)}
+
+/* FLOATING POINTS */
+.float-pt{position:fixed;font-size:20px;font-weight:900;color:var(--green-dark);pointer-events:none;z-index:700;animation:pts-fly 1s ease-out forwards}
+@keyframes pts-fly{from{opacity:1;transform:translateY(0) scale(1)}50%{opacity:1;transform:translateY(-28px) scale(1.2)}to{opacity:0;transform:translateY(-70px) scale(.8)}}
+.water-drop{position:fixed;font-size:22px;pointer-events:none;z-index:700;animation:drop-anim .7s ease-out forwards}
+@keyframes drop-anim{from{opacity:1;transform:scale(.6)}to{opacity:0;transform:scale(1.6) translateY(-16px)}}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:800;overflow:hidden}
+.conf{position:absolute;top:-10px;width:8px;height:8px;border-radius:2px;animation:conf-fall 1.5s ease-in forwards}
+@keyframes conf-fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ══════════ FEEDBACK ══════════ */
+.feedback-opt{
+  flex:1;padding:8px 4px;border-radius:12px;border:2.5px solid #E0D0C0;
+  background:white;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;
+  cursor:pointer;color:var(--text-mid);transition:all .2s;
+}
+.feedback-opt.sel{background:var(--green);color:white;border-color:var(--green-dark)}
+.star-btn{font-size:32px;cursor:pointer;filter:grayscale(1) opacity(.4);transition:filter .15s;background:none;border:none;padding:0 2px}
+.star-btn.on{filter:none}
+.feedback-textarea{
+  width:100%;border:2px solid #E0D0C0;border-radius:14px;
+  padding:10px 12px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text);
+  resize:none;height:80px;margin:12px 0;outline:none;
+}
+.feedback-textarea:focus{border-color:var(--green)}
+.analytics-row{background:#F0FAE8;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.analytics-row .ar-icon{font-size:20px}
+.analytics-row .ar-text{font-size:12px;font-weight:700;color:#3A7020}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SPLASH -->
+<div class="screen" id="splash">
+  <div class="splash-logo">🌱</div>
+  <div class="splash-title">AR Ферма</div>
+  <div class="splash-sub">Расти · Собирай · Получай</div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="screen hidden" id="onboarding">
+  <div class="onb-slides">
+    <div class="onb-slide active" id="os0">
+      <div class="onb-big">🌾</div>
+      <div class="onb-title">Привет!<br>Это твоя ферма</div>
+      <div class="onb-desc">Выращивай клубнику,<br>ухаживай за растениями<br>и собирай урожай каждый день</div>
+    </div>
+    <div class="onb-slide" id="os1">
+      <div class="onb-steps"><span>🌱</span><span class="onb-arr">→</span><span>🌸</span><span class="onb-arr">→</span><span>🍓</span></div>
+      <div class="onb-title">Сажай, поливай,<br>собирай урожай</div>
+      <div class="onb-desc">Возвращайся каждый день.<br>Полив ускоряет рост —<br>пропустишь немного, не страшно 💧</div>
+    </div>
+    <div class="onb-slide" id="os2">
+      <div class="onb-big">🚚</div>
+      <div class="onb-title">Скоро —<br>настоящие продукты!</div>
+      <div class="onb-desc">Игра в раннем доступе.</div>
+      <div class="onb-badge">Собирай урожай и обменяй<br>на настоящую клубнику<br>с доставкой домой 🍓<br><small style="opacity:.75">Доставка появится в следующей версии</small></div>
+    </div>
+    <div class="onb-slide" id="os3">
+      <div class="onb-big">🎁</div>
+      <div class="onb-title">Ферма лучше<br>с друзьями</div>
+      <div class="onb-desc">Делись урожаем,<br>получай улыбки</div>
+      <div class="onb-steps" style="font-size:28px">👩 🎁 👨 🎁 🧑</div>
+    </div>
+  </div>
+  <div class="onb-footer">
+    <div class="onb-dots">
+      <div class="onb-dot active" id="od0"></div>
+      <div class="onb-dot" id="od1"></div>
+      <div class="onb-dot" id="od2"></div>
+      <div class="onb-dot" id="od3"></div>
+    </div>
+    <button class="btn-primary" id="onb-btn">Далее →</button>
+    <button class="btn-ghost" id="onb-skip">Пропустить</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen hidden" id="game">
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="score-pill">🌾 <span class="score-val" id="sv">0</span></div>
+    <div class="prog-col">
+      <div class="prog-lbl">До промокода: <span id="pr">500</span> ✦</div>
+      <div class="prog-bg"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+    </div>
+    <button class="top-icon" id="weather-icon">☀️</button>
+    <button class="top-icon" onclick="openStats()">⚙️</button>
+  </div>
+
+  <!-- Sky -->
+  <div class="sky" id="sky">
+    <div class="sky-particles" id="skyp"></div>
+    <span class="sky-cloud sky-c1">☁️</span>
+    <span class="sky-cloud sky-c2">☁️</span>
+    <span class="sky-sun" id="sky-icon">☀️</span>
+  </div>
+  <div class="grass" id="grass-strip"></div>
+
+  <!-- Farm area -->
+  <div class="farm-area" id="farm">
+    <div class="tree-bg" id="tree-bg">🌱</div>
+
+    <!-- Daily gift -->
+    <div class="gift-at-gate" id="daily-gift" onclick="openGift()">
+      <div class="gift-box-icon">🎁</div>
+      <div class="gift-box-label">Подарок!</div>
+    </div>
+
+    <!-- Beds row 1 -->
+    <div class="beds-row">
+      <div class="bed bed-empty" id="bed-0" onclick="tapBed(0)">
+        <span class="bed-water">💧</span>
+        <span class="bed-plant">🪹</span>
+        <span class="bed-label">Нажми — посади</span>
+      </div>
+      <div class="bed bed-empty" id="bed-1" onclick="tapBed(1)">
+        <span class="bed-water">💧</span>
+        <span class="bed-plant">🪹</span>
+        <span class="bed-label">Нажми — посади</span>
+      </div>
+      <div class="bed bed-empty" id="bed-2" onclick="tapBed(2)">
+        <span class="bed-water">💧</span>
+        <span class="bed-plant">🪹</span>
+        <span class="bed-label">Нажми — посади</span>
+      </div>
+    </div>
+
+    <!-- Beds row 2 -->
+    <div class="beds-row" style="grid-template-columns:1fr 1fr;padding:0 20%">
+      <div class="bed bed-empty" id="bed-3" onclick="tapBed(3)">
+        <span class="bed-water">💧</span>
+        <span class="bed-plant">🪹</span>
+        <span class="bed-label">Нажми — посади</span>
+      </div>
+      <div class="bed bed-empty" id="bed-4" onclick="tapBed(4)">
+        <span class="bed-water">💧</span>
+        <span class="bed-plant">🪹</span>
+        <span class="bed-label">Нажми — посади</span>
+      </div>
+    </div>
+
+    <!-- Pet -->
+    <div class="pet-wrap" id="pet-wrap">
+      <div class="pet-bubble hidden" id="pet-bubble">Скучал… 🍓</div>
+      <div class="pet-icon" id="pet-icon">🦔</div>
+    </div>
+
+    <!-- Neighbor bar -->
+    <div class="neighbor-bar">
+      <div class="nb-avatars">
+        <div class="nb-av">👤</div>
+        <div class="nb-av">👤</div>
+      </div>
+      <div>
+        <div class="nb-text">Друг собрал урожай сегодня 🍓</div>
+        <div class="nb-sub">Смотреть их ферму →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action bar -->
+  <div class="action-bar">
+    <button class="ab ab-plant" onclick="setMode('plant')"><span class="ic">🌱</span>Посадить</button>
+    <button class="ab ab-water" id="wb" onclick="setMode('water')"><span class="ic">💧</span>Полив</button>
+    <button class="ab ab-gift" onclick="showGiftInfo()"><span class="ic">🎁</span>Подарить</button>
+    <button class="ab ab-stats" onclick="openStats()"><span class="ic">📊</span>Статус</button>
+  </div>
+</div>
+
+<!-- TUTORIAL -->
+<div id="tutorial" class="hidden"></div>
+
+<!-- HARVEST MODAL -->
+<div id="harvest-modal" class="modal-bg hidden">
+  <div class="modal-card">
+    <div class="modal-tabs">
+      <button class="mtab on" onclick="switchTab('pts',this)">🌾 Очки</button>
+      <button class="mtab" onclick="switchTab('card',this)">📸 Открытка</button>
+    </div>
+    <div id="tab-pts" class="tab-pane on">
+      <span class="harvest-icon" id="hi">🍓</span>
+      <div style="font-size:21px;font-weight:900;color:var(--text);margin:10px 0 4px">Урожай собран!</div>
+      <div class="harvest-pts" id="hp">+62</div>
+      <div class="modal-sub" id="hs">Клубника в корзине 🧺</div>
+      <button class="btn-primary" onclick="closeHarvest()">Забрать 🌱</button>
+      <button class="btn-social" onclick="closeHarvest()">Отправить другу 🎁</button>
+    </div>
+    <div id="tab-card" class="tab-pane">
+      <div class="postcard">
+        <span class="postcard-main">🍓</span>
+        <div class="postcard-title">Урожай AR Фермы</div>
+        <div class="postcard-date" id="pc-date">9 июня 2026</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-light);margin-bottom:14px">Сохрани или поделись с другом</div>
+      <button class="btn-primary" onclick="closeHarvest()">Поделиться 📤</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIFT MODAL -->
+<div id="gift-modal" class="modal-bg hidden">
+  <div class="modal-card">
+    <span class="gift-modal-icon" id="gift-icon">🎁</span>
+    <div class="gift-reward" id="gift-reward">+30 очков</div>
+    <div class="gift-desc" id="gift-desc">Ежедневный подарок открыт!</div>
+    <button class="btn-primary" onclick="closeGift()">Отлично! 🌟</button>
+  </div>
+</div>
+
+<!-- STATS SHEET -->
+<div id="stats-modal" class="stats-bg hidden" onclick="if(event.target===this)closeStats()">
+  <div class="stats-sheet">
+    <div class="sheet-handle"></div>
+    <div class="stats-title">Моя ферма 🌿</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="st-score">0</div><div class="stat-lbl">Очков всего</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-harv">0</div><div class="stat-lbl">Урожаев</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-grow">0</div><div class="stat-lbl">Растут сейчас</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-ready">0</div><div class="stat-lbl">Готово</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-sess">1</div><div class="stat-lbl">Сессий</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-water">0</div><div class="stat-lbl">Поливов</div></div>
+    </div>
+    <div class="tree-progress">
+      <div class="tree-phase" id="tp-icon">🌱</div>
+      <div class="tree-info">
+        <div class="tree-name" id="tp-name">Дерево — Росток</div>
+        <div class="tree-hint" id="tp-hint">Собери ещё 100 ✦</div>
+      </div>
+    </div>
+    <div class="brag-wall">
+      <div class="brag-title">📌 Достижения</div>
+      <div class="medals" id="medals">
+        <div class="medal" id="m0"><span class="medal-icon">🍓</span><div class="medal-name">1-й урожай</div></div>
+        <div class="medal" id="m1"><span class="medal-icon">💧</span><div class="medal-name">10 поливов</div></div>
+        <div class="medal" id="m2"><span class="medal-icon">🎁</span><div class="medal-name">1-й подарок</div></div>
+        <div class="medal" id="m3"><span class="medal-icon">⭐</span><div class="medal-name">100 очков</div></div>
+        <div class="medal" id="m4"><span class="medal-icon">🌳</span><div class="medal-name">Дерево цветёт</div></div>
+        <div class="medal" id="m5"><span class="medal-icon">❤️</span><div class="medal-name">Другу — урожай</div></div>
+      </div>
+    </div>
+    <div class="analytics-row">
+      <span class="ar-icon">📊</span>
+      <span class="ar-text" id="st-analytics-hint">Статистика сохранена локально</span>
+    </div>
+    <button class="btn-social" onclick="closeStats();openFeedback()" style="margin-bottom:10px">Оставить отзыв 📝</button>
+    <button class="btn-primary" onclick="closeStats()">Закрыть</button>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedback-modal" class="modal-bg hidden" onclick="if(event.target===this)closeFeedback()">
+  <div class="modal-card" style="max-height:90vh;overflow-y:auto">
+    <div style="font-size:28px;margin-bottom:4px">📝</div>
+    <div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px">Как тебе ферма?</div>
+    <div style="font-size:12px;color:var(--text-light);margin-bottom:18px">Займёт 1 минуту — это важно для нас</div>
+
+    <div style="margin-bottom:16px;text-align:left">
+      <div style="font-size:13px;font-weight:800;color:var(--text-mid);margin-bottom:8px">Оценка 👇</div>
+      <div id="star-row" style="display:flex;justify-content:center;gap:4px">
+        <button class="star-btn" data-v="1" onclick="rateStar(1)">⭐</button>
+        <button class="star-btn" data-v="2" onclick="rateStar(2)">⭐</button>
+        <button class="star-btn" data-v="3" onclick="rateStar(3)">⭐</button>
+        <button class="star-btn" data-v="4" onclick="rateStar(4)">⭐</button>
+        <button class="star-btn" data-v="5" onclick="rateStar(5)">⭐</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;text-align:left">
+      <div style="font-size:13px;font-weight:800;color:var(--text-mid);margin-bottom:8px">Вернёшься завтра?</div>
+      <div style="display:flex;gap:8px">
+        <button class="feedback-opt" id="fo-yes"   onclick="pickReturn('yes')">Да 👍</button>
+        <button class="feedback-opt" id="fo-maybe" onclick="pickReturn('maybe')">Может 🤔</button>
+        <button class="feedback-opt" id="fo-no"    onclick="pickReturn('no')">Нет 😅</button>
+      </div>
+    </div>
+
+    <div style="text-align:left">
+      <div style="font-size:13px;font-weight:800;color:var(--text-mid);margin-bottom:6px">Что понравилось / что непонятно?</div>
+      <textarea class="feedback-textarea" id="feedback-text" placeholder="Напиши всё что думаешь…"></textarea>
+    </div>
+
+    <button class="btn-primary" onclick="submitFeedback()">Отправить ✅</button>
+    <button class="btn-ghost" onclick="closeFeedback()">Потом</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════
+//  CONFIG
+// ═══════════════════════════════
+const PHASE_MS   = 45 * 1000;   // 45 sec per phase (prototype speed)
+const PHASES     = ['empty','seed','sprout','flower','ready'];
+const EMOJI      = {empty:'🪹',seed:'🌱',sprout:'🌿',flower:'🌸',ready:'🍓'};
+const LABELS     = {empty:'Нажми — посади',seed:'Прорастает...',sprout:'Развивается...',flower:'Почти готово!',ready:'Нажми — собери!'};
+const BG_CLASS   = {empty:'bed-empty',seed:'bed-seed',sprout:'bed-sprout',flower:'bed-flower',ready:'bed-ready'};
+const UNLOCK_AT  = 500;
+const TREE_PHASES = [
+  {min:0,  icon:'🌱', name:'Росток',             hint:'Ещё %d ✦ до деревца'},
+  {min:100,icon:'🌿', name:'Деревце с листвой',  hint:'Ещё %d ✦ до цветения'},
+  {min:300,icon:'🌸', name:'Цветущее дерево',    hint:'Ещё %d ✦ до большого'},
+  {min:500,icon:'🌳', name:'Большое дерево! 🎉', hint:'Максимальный уровень'},
+];
+const TREE_BG = {0:'🌱',1:'🌿',2:'🌸',3:'🌳'};
+
+// ═══════════════════════════════
+//  ANALYTICS
+// ═══════════════════════════════
+const ANALYTICS_KEY = 'ar_farm_v2_analytics';
+let analytics = JSON.parse(localStorage.getItem(ANALYTICS_KEY) || '{"sessions":0,"events":{}}');
+analytics.sessions = (analytics.sessions||0) + 1;
+analytics.lastOpen = new Date().toISOString();
+localStorage.setItem(ANALYTICS_KEY, JSON.stringify(analytics));
+
+function trackEvent(name){
+  analytics.events[name] = (analytics.events[name]||0) + 1;
+  localStorage.setItem(ANALYTICS_KEY, JSON.stringify(analytics));
+}
+
+// ═══════════════════════════════
+//  STATE
+// ═══════════════════════════════
+let beds = Array.from({length:5},()=>({
+  state:'empty', startedAt:null, phaseMs:PHASE_MS, watered:false
+}));
+let score = 0, harvests = 0, waters = 0, giftOpened = false;
+let mode  = 'plant';   // 'plant' | 'water'
+let tutStep = 0;
+let giftGiven = false;
+let firstPlant = false, firstWater = false;
+
+// ═══════════════════════════════
+//  SPLASH → ONBOARDING
+// ═══════════════════════════════
+setTimeout(()=>{ showScreen('onboarding'); }, 2500);
+
+// ═══════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════
+let onbIdx = 0;
+const ONB = 4;
+function refreshOnb(){
+  for(let i=0;i<ONB;i++){
+    document.getElementById('os'+i).className='onb-slide'+(i===onbIdx?' active':i<onbIdx?' out':'');
+    document.getElementById('od'+i).className='onb-dot'+(i===onbIdx?' active':'');
+  }
+  document.getElementById('onb-btn').textContent = onbIdx===ONB-1 ? '🌱 Начать игру' : 'Далее →';
+  document.getElementById('onb-skip').style.visibility = onbIdx===ONB-1 ? 'hidden' : 'visible';
+}
+document.getElementById('onb-btn').onclick = ()=>{
+  if(onbIdx<ONB-1){ onbIdx++; refreshOnb(); } else startGame();
+};
+document.getElementById('onb-skip').onclick = ()=>{ onbIdx=ONB-1; refreshOnb(); };
+
+// ═══════════════════════════════
+//  GAME START
+// ═══════════════════════════════
+function startGame(){
+  showScreen('game');
+  setTimeOfDay();
+  setInterval(tickBeds, 500);
+  setInterval(setTimeOfDay, 60000);
+  setTimeout(tutStart, 700);
+  // show gift after short delay
+  setTimeout(()=>{ if(!giftGiven) document.getElementById('daily-gift').classList.remove('hidden'); }, 1200);
+  trackEvent('onboarding_complete');
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ═══════════════════════════════
+//  TIME OF DAY
+// ═══════════════════════════════
+function setTimeOfDay(){
+  const h = new Date().getHours();
+  const sky = document.getElementById('sky');
+  const icon = document.getElementById('sky-icon');
+  const grass = document.getElementById('grass-strip');
+  const skyp = document.getElementById('skyp');
+  skyp.innerHTML='';
+
+  if(h>=6 && h<12){
+    sky.style.background='linear-gradient(180deg,#FFDEA8 0%,#FFF5D0 50%,#C8E8B0 100%)';
+    grass.style.background='linear-gradient(180deg,#7AC84A,#4A8820)';
+    grass.style.boxShadow='0 3px 0 #2A6010';
+    icon.textContent='🌅';
+    document.getElementById('weather-icon').textContent='🌅';
+  } else if(h>=12 && h<18){
+    sky.style.background='linear-gradient(180deg,#B8D8F8 0%,#E0F0FF 50%,#C8E8B0 100%)';
+    grass.style.background='linear-gradient(180deg,#5A9E3A,#3A7020)';
+    grass.style.boxShadow='0 3px 0 #2A6010';
+    icon.textContent='☀️';
+    document.getElementById('weather-icon').textContent='☀️';
+  } else if(h>=18 && h<22){
+    sky.style.background='linear-gradient(180deg,#FF9860 0%,#FFCF88 50%,#D4E890 100%)';
+    grass.style.background='linear-gradient(180deg,#5A8830,#384018)';
+    grass.style.boxShadow='0 3px 0 #182810';
+    icon.textContent='🌇';
+    document.getElementById('weather-icon').textContent='🌇';
+  } else {
+    sky.style.background='linear-gradient(180deg,#1A2550 0%,#2C3878 50%,#2A5018 100%)';
+    grass.style.background='linear-gradient(180deg,#2A5018,#182810)';
+    grass.style.boxShadow='0 3px 0 #0A1808';
+    icon.textContent='🌙';
+    document.getElementById('weather-icon').textContent='🌙';
+    // fireflies
+    for(let i=0;i<8;i++){
+      const ff=document.createElement('div');
+      ff.className='firefly';
+      ff.style.cssText=`left:${10+Math.random()*80}%;top:${10+Math.random()*65}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s`;
+      skyp.appendChild(ff);
+    }
+  }
+}
+
+// ═══════════════════════════════
+//  TUTORIAL
+// ═══════════════════════════════
+const TUT = [
+  {bed:0, text:'👆 Нажми на грядку, чтобы посадить клубнику', when:'seed'},
+  {bed:0, text:'💧 Нажми «Полив», затем нажми на грядку — ускорит рост', when:'watered'},
+  {bed:0, text:'🍓 Созрело! Нажми на грядку, чтобы собрать урожай', when:'harvested'},
+];
+
+function tutStart(){ tutStep=0; renderTut(); }
+
+function renderTut(){
+  const tut=document.getElementById('tutorial');
+  if(tutStep>=TUT.length){ tut.classList.add('hidden'); return; }
+  const t=TUT[tutStep];
+  const el=document.getElementById('bed-'+t.bed);
+  if(!el){ tut.classList.add('hidden'); return; }
+  const r=el.getBoundingClientRect();
+  const pad=8, cx=r.left+r.width/2;
+  const spaceAbove=r.top-pad-90;
+  const btop = spaceAbove>60 ? r.top-pad-82 : r.bottom+pad+12;
+  const tipCls = spaceAbove>60 ? 'tip-down' : 'tip-up';
+  const bleft = Math.max(8, Math.min(cx-110, window.innerWidth-230));
+  tut.innerHTML=`
+    <div class="tut-spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px" onclick="tutTap(${t.bed})"></div>
+    <div class="tut-finger" style="left:${cx-14}px;top:${r.bottom+4}px">👆</div>
+    <div class="tut-bubble ${tipCls}" style="left:${bleft}px;top:${btop}px;width:220px">${t.text}</div>
+  `;
+  tut.classList.remove('hidden');
+}
+
+function tutTap(idx){ tapBed(idx,true); }
+
+function tutCheck(ev){
+  if(tutStep>=TUT.length) return;
+  if(TUT[tutStep].when===ev){
+    tutStep++;
+    setTimeout(renderTut,400);
+  }
+}
+
+// ═══════════════════════════════
+//  BED INTERACTION
+// ═══════════════════════════════
+function setMode(m){
+  mode=m;
+  document.getElementById('wb').classList.toggle('on', m==='water');
+  document.getElementById('wb').querySelector('.ic').textContent = m==='water' ? '🚿' : '💧';
+}
+
+function tapBed(idx, fromTut=false){
+  const bed=beds[idx];
+  if(bed.state==='empty'){
+    plant(idx);
+  } else if(bed.state==='ready'){
+    harvest(idx);
+  } else if(mode==='water'){
+    waterBed(idx);
+  } else {
+    const el=document.getElementById('bed-'+idx);
+    el.style.transform='scale(.93) translateY(3px)';
+    setTimeout(()=>el.style.transform='',130);
+  }
+}
+
+function plant(idx){
+  const bed=beds[idx];
+  bed.state='seed'; bed.startedAt=Date.now(); bed.phaseMs=PHASE_MS; bed.watered=false;
+  renderBed(idx);
+  tutCheck('seed');
+  petReact('happy');
+  if(!firstPlant){ firstPlant=true; trackEvent('first_plant'); }
+  trackEvent('plant');
+}
+
+function waterBed(idx){
+  const bed=beds[idx];
+  if(bed.state==='empty'||bed.state==='ready'||bed.watered) return;
+  bed.watered=true;
+  const el=document.getElementById('bed-'+idx), r=el.getBoundingClientRect();
+  const elapsed=Date.now()-bed.startedAt, rem=Math.max(0,bed.phaseMs-elapsed);
+  bed.startedAt=Date.now()-elapsed-rem*.45;
+  renderBed(idx);
+  spawnDrop(r.left+r.width/2-11, r.top+r.height/2-11);
+  waters++;
+  if(waters>=10) earnMedal(1);
+  tutCheck('watered');
+  setMode('plant');
+  if(!firstWater){ firstWater=true; trackEvent('first_water'); }
+  trackEvent('water');
+}
+
+function harvest(idx){
+  const isGolden = Math.random()<.12;
+  const pts = isGolden ? (80+Math.floor(Math.random()*40)) : (45+Math.floor(Math.random()*30));
+  score+=pts; harvests++;
+  updateScore();
+  const el=document.getElementById('bed-'+idx), r=el.getBoundingClientRect();
+  spawnFloat(r.left+r.width/2-32, r.top, '+'+pts+' 🌾');
+  beds[idx]={state:'empty',startedAt:null,phaseMs:PHASE_MS,watered:false};
+  renderBed(idx);
+  tutCheck('harvested');
+  document.getElementById('tutorial').classList.add('hidden');
+  earnMedal(0);
+  trackEvent('harvest');
+  if(harvests===1) trackEvent('first_harvest');
+  if(score>=100) earnMedal(3);
+  showHarvest(pts, isGolden);
+  petReact('happy');
+  if(isGolden) spawnConfetti();
+}
+
+function showHarvest(pts, golden){
+  document.getElementById('hi').textContent = golden ? '✨🍓✨' : '🍓';
+  const hpEl=document.getElementById('hp');
+  hpEl.textContent='+'+pts+' очков';
+  hpEl.className='harvest-pts'+(golden?' golden':'');
+  document.getElementById('hs').textContent = golden ? '🌟 Золотой урожай! Удача!' : 'Клубника в корзине 🧺';
+  document.getElementById('pc-date').textContent=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  switchTab('pts', document.querySelector('.mtab'));
+  document.getElementById('harvest-modal').classList.remove('hidden');
+}
+
+function closeHarvest(){ document.getElementById('harvest-modal').classList.add('hidden'); }
+
+// ═══════════════════════════════
+//  GROWTH TICK
+// ═══════════════════════════════
+function tickBeds(){
+  beds.forEach((bed,idx)=>{
+    if(bed.state==='empty'||bed.state==='ready') return;
+    const pi=PHASES.indexOf(bed.state);
+    if(pi<1) return;
+    const elapsed=Date.now()-bed.startedAt;
+    if(elapsed>=bed.phaseMs){
+      const next=PHASES[pi+1];
+      if(next){ bed.state=next; bed.startedAt=Date.now(); bed.watered=false; renderBed(idx); }
+      if(idx===0&&next==='ready'&&tutStep===2) renderTut();
+    } else {
+      const t=document.getElementById('bt'+idx);
+      if(t) t.textContent=Math.ceil((bed.phaseMs-elapsed)/1000)+'с';
+    }
+  });
+  updateMoods();
+}
+
+// ═══════════════════════════════
+//  RENDER BED
+// ═══════════════════════════════
+function renderBed(idx){
+  const bed=beds[idx], el=document.getElementById('bed-'+idx);
+  // class
+  el.className='bed '+BG_CLASS[bed.state]+(bed.watered?' watered':'');
+  // plant emoji
+  el.querySelector('.bed-plant').textContent=EMOJI[bed.state];
+  // label
+  el.querySelector('.bed-label').textContent=LABELS[bed.state];
+  // timer
+  let t=document.getElementById('bt'+idx);
+  if(!t){ t=document.createElement('span'); t.id='bt'+idx; t.className='bed-timer'; el.appendChild(t); }
+  const showT=bed.state!=='empty'&&bed.state!=='ready';
+  t.style.display=showT?'':'none';
+  // butterfly for happy mood
+  let bf=el.querySelector('.butterfly');
+  if(bed.state==='sprout'||bed.state==='flower'){
+    if(!bf){ bf=document.createElement('span'); bf.className='butterfly'; bf.textContent='🦋'; el.appendChild(bf); }
+  } else { if(bf) bf.remove(); }
+}
+
+// ═══════════════════════════════
+//  MOODS
+// ═══════════════════════════════
+function updateMoods(){
+  beds.forEach((bed,idx)=>{
+    if(bed.state==='empty'||bed.state==='ready') return;
+    const el=document.getElementById('bed-'+idx);
+    const elapsed=Date.now()-bed.startedAt;
+    const pct=elapsed/bed.phaseMs;
+    el.classList.remove('mood-sad','mood-almost');
+    if(!bed.watered&&pct>.6) el.classList.add('mood-sad');
+    if(bed.state==='flower'&&pct>.75) el.classList.add('mood-almost');
+  });
+}
+
+// ═══════════════════════════════
+//  SCORE & TREE
+// ═══════════════════════════════
+function updateScore(){
+  document.getElementById('sv').textContent=score;
+  const pct=Math.min(score/UNLOCK_AT*100,100);
+  document.getElementById('pf').style.width=pct+'%';
+  const rem=Math.max(0,UNLOCK_AT-score);
+  document.getElementById('pr').textContent=rem>0?rem:'✓';
+  // tree
+  let ti=0;
+  for(let i=TREE_PHASES.length-1;i>=0;i--){ if(score>=TREE_PHASES[i].min){ ti=i; break; } }
+  document.getElementById('tree-bg').textContent=TREE_BG[ti];
+  if(ti>=2) earnMedal(4);
+}
+
+// ═══════════════════════════════
+//  STATS
+// ═══════════════════════════════
+function openStats(){
+  document.getElementById('st-score').textContent=score;
+  document.getElementById('st-harv').textContent=harvests;
+  document.getElementById('st-grow').textContent=beds.filter(b=>b.state!=='empty'&&b.state!=='ready').length;
+  document.getElementById('st-ready').textContent=beds.filter(b=>b.state==='ready').length;
+  document.getElementById('st-sess').textContent=analytics.sessions;
+  document.getElementById('st-water').textContent=waters;
+  const evts=analytics.events;
+  const tips=[];
+  if(evts.first_harvest) tips.push('🍓 Первый урожай собран');
+  if(evts.water>=5) tips.push('💧 Полито '+evts.water+' раз');
+  if(analytics.sessions>3) tips.push('🏅 Сессий: '+analytics.sessions);
+  document.getElementById('st-analytics-hint').textContent=tips.length ? tips[tips.length-1] : 'Статистика сохранена';
+  let ti=0;
+  for(let i=TREE_PHASES.length-1;i>=0;i--){ if(score>=TREE_PHASES[i].min){ ti=i; break; } }
+  const tp=TREE_PHASES[ti];
+  document.getElementById('tp-icon').textContent=tp.icon;
+  document.getElementById('tp-name').textContent='Дерево — '+tp.name;
+  const next=TREE_PHASES[ti+1];
+  document.getElementById('tp-hint').textContent=next ? tp.hint.replace('%d',next.min-score) : tp.hint;
+  document.getElementById('stats-modal').classList.remove('hidden');
+}
+function closeStats(){ document.getElementById('stats-modal').classList.add('hidden'); }
+
+// ═══════════════════════════════
+//  GIFT
+// ═══════════════════════════════
+function openGift(){
+  document.getElementById('daily-gift').classList.add('hidden');
+  giftGiven=true;
+  const gifts=[
+    {icon:'🌱',reward:'+30 очков',desc:'Семена для нового урожая!'},
+    {icon:'💧',reward:'+2 поливки',desc:'Немного живительной влаги'},
+    {icon:'⭐',reward:'+50 очков',desc:'Звёздный день на ферме!'},
+  ];
+  const g=gifts[Math.floor(Math.random()*gifts.length)];
+  document.getElementById('gift-icon').textContent=g.icon;
+  document.getElementById('gift-reward').textContent=g.reward;
+  document.getElementById('gift-desc').textContent=g.desc;
+  document.getElementById('gift-modal').classList.remove('hidden');
+  score+=30; updateScore();
+  earnMedal(2);
+}
+function closeGift(){ document.getElementById('gift-modal').classList.add('hidden'); }
+
+// ═══════════════════════════════
+//  GIFT INFO (donate)
+// ═══════════════════════════════
+function showGiftInfo(){
+  alert('🎁 Подарок другу\n\nСобери урожай и отправь корзину другу.\nФункция появится в следующей версии!');
+}
+
+// ═══════════════════════════════
+//  PET
+// ═══════════════════════════════
+function petReact(state){
+  const icon=document.getElementById('pet-icon');
+  if(state==='happy'){
+    icon.style.animation='pet-jump .6s ease-in-out 3';
+    setTimeout(()=>icon.style.animation='pet-idle 3s ease-in-out infinite',1900);
+  }
+}
+
+// ═══════════════════════════════
+//  MEDALS
+// ═══════════════════════════════
+function earnMedal(idx){ document.getElementById('m'+idx)?.classList.add('earned'); }
+
+// ═══════════════════════════════
+//  MODAL TABS
+// ═══════════════════════════════
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+tab).classList.add('on');
+  btn.classList.add('on');
+}
+
+// ═══════════════════════════════
+//  VFX
+// ═══════════════════════════════
+function spawnFloat(x,y,txt){
+  const f=document.createElement('div');
+  f.className='float-pt'; f.textContent=txt;
+  f.style.left=x+'px'; f.style.top=y+'px';
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),1100);
+}
+
+function spawnDrop(x,y){
+  const d=document.createElement('div');
+  d.className='water-drop'; d.textContent='💧';
+  d.style.left=x+'px'; d.style.top=y+'px';
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),750);
+}
+
+function spawnConfetti(){
+  const w=document.createElement('div'); w.className='confetti-wrap';
+  const cols=['#E8453C','#F5C542','#5A9E3A','#4AADE8','#FF8C00'];
+  for(let i=0;i<40;i++){
+    const c=document.createElement('div'); c.className='conf';
+    c.style.cssText=`left:${Math.random()*100}%;background:${cols[i%cols.length]};animation-delay:${Math.random()*.5}s;animation-duration:${1+Math.random()*.8}s;transform:rotate(${Math.random()*360}deg)`;
+    w.appendChild(c);
+  }
+  document.body.appendChild(w);
+  setTimeout(()=>w.remove(),2500);
+}
+
+// ═══════════════════════════════
+//  FEEDBACK
+// ═══════════════════════════════
+let fbRating=0, fbReturn='';
+
+function openFeedback(){
+  fbRating=0; fbReturn='';
+  document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.feedback-opt').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('feedback-text').value='';
+  document.getElementById('feedback-modal').classList.remove('hidden');
+  trackEvent('feedback_opened');
+}
+function closeFeedback(){ document.getElementById('feedback-modal').classList.add('hidden'); }
+
+function rateStar(n){
+  fbRating=n;
+  document.querySelectorAll('.star-btn').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.v)<=n));
+}
+
+function pickReturn(v){
+  fbReturn=v;
+  ['yes','maybe','no'].forEach(k=>document.getElementById('fo-'+k).classList.toggle('sel',k===v));
+}
+
+function submitFeedback(){
+  const text=document.getElementById('feedback-text').value.trim();
+  const fb={
+    rating:fbRating, willReturn:fbReturn, text:text,
+    score:score, harvests:harvests, sessions:analytics.sessions,
+    ts:new Date().toISOString()
+  };
+  // save locally
+  const all=JSON.parse(localStorage.getItem('ar_farm_feedback')||'[]');
+  all.push(fb);
+  localStorage.setItem('ar_farm_feedback', JSON.stringify(all));
+  trackEvent('feedback_sent');
+  closeFeedback();
+  // thank you
+  const stars='⭐'.repeat(fbRating||1);
+  setTimeout(()=>{
+    alert(`${stars}\nСпасибо за отзыв! 🙌\n\nЭто очень помогает сделать ферму лучше.`);
+  }, 150);
+}
+</script>
+</body>
+</html>
